@@ -3,7 +3,7 @@
 #define DATAMANAGER_H
 
 #include "shaders/Soltrace.h"
-#include "element.h"
+#include "CspElement.h"
 #include <vector>
 
 namespace OptixCSP {

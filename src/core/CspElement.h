@@ -1,10 +1,9 @@
-#ifndef SOLTRACE_ELEMENT_H
-#define SOLTRACE_ELEMENT_H
+#pragma once
 
 #include <cstdint>
 #include <string>
 
-#include "vector3d.h"
+#include "Vec3d.h"
 #include "soltrace_type.h"
 #include "surface.h"
 #include "aperture.h"
@@ -14,22 +13,22 @@
 namespace OptixCSP {
 
     class Aperture;
-    class ElementBase {
+    class CspElementBase {
     public:
-        ElementBase();
-        virtual ~ElementBase() = default;
+        CspElementBase();
+        virtual ~CspElementBase() = default;
 
         // Positioning and orientation.
-        virtual const Vector3d& get_origin() const = 0;
-        virtual void set_origin(const Vector3d&) = 0;
-        virtual const Vector3d& get_aim_point() const = 0;
-        virtual void set_aim_point(const Vector3d&) = 0;
-        //virtual const Vector3d& get_euler_angles() const = 0;
-        //virtual void set_euler_angles(const Vector3d&) = 0;
+        virtual const Vec3d& get_origin() const = 0;
+        virtual void set_origin(const OptixCSP::Vec3d&) = 0;
+        virtual const Vec3d& get_aim_point() const = 0;
+        virtual void set_aim_point(const Vec3d&) = 0;
+        //virtual const Vec3d& get_euler_angles() const = 0;
+        //virtual void set_euler_angles(const Vec3d&) = 0;
 
         // Bounding box accessors.
-        //virtual const Vector3d& get_upper_bounding_box() const = 0;
-        //virtual const Vector3d& get_lower_bounding_box() const = 0;
+        //virtual const Vec3d& get_upper_bounding_box() const = 0;
+        //virtual const Vec3d& get_lower_bounding_box() const = 0;
 
 
 	    virtual GeometryDataST toDeviceGeometryData() const = 0;
@@ -40,16 +39,16 @@ namespace OptixCSP {
     };
 
     // A concrete implementation of Element that stores data in member variables.
-    class Element : public ElementBase {
+    class CspElement : public CspElementBase {
     public:
-        Element();
-        ~Element() = default;
+        CspElement();
+        ~CspElement() = default;
 
         // set and get origin 
-        const Vector3d& get_origin() const override;
-        void set_origin(const Vector3d& o) override;
-        void set_aim_point(const Vector3d& a) override;
-        const Vector3d& get_aim_point() const override;
+        const Vec3d& get_origin() const override;
+        void set_origin(const Vec3d& o) override;
+        void set_aim_point(const Vec3d& a) override;
+        const Vec3d& get_aim_point() const override;
         void set_zrot(double zrot);
         double get_zrot() const;
         std::shared_ptr<Aperture> get_aperture() const;
@@ -57,26 +56,26 @@ namespace OptixCSP {
         ApertureType get_aperture_type() const;
         SurfaceType get_surface_type() const;
 
-        // Optical elements setters.
+        // Optical CspElements setters.
         void set_aperture(const std::shared_ptr<Aperture>& aperture);
         void set_surface(const std::shared_ptr<Surface>& surface);
 
         // set orientation based on aimpoint and zrot
-        void update_euler_angles(const Vector3d& aim_point, const double zrot);
-	    // set orientation based on the element's aim point and zrot
+        void update_euler_angles(const Vec3d& aim_point, const double zrot);
+	    // set orientation based on the CspElement's aim point and zrot
         void update_euler_angles();
 
-        void update_element(const Vector3d& aim_point, const double zrot);
+        void update_element(const Vec3d& aim_point, const double zrot);
 
         // return L2G rotation matrix
         Matrix33d get_rotation_matrix() const;
 
 
         // return upper bounding box
-        Vector3d get_upper_bounding_box() const;
+        Vec3d get_upper_bounding_box() const;
 
 	    // return lower bounding box
-        Vector3d get_lower_bounding_box() const;
+        Vec3d get_lower_bounding_box() const;
 
         // convert to device data available to GPU
         GeometryDataST toDeviceGeometryData() const override; 
@@ -90,18 +89,16 @@ namespace OptixCSP {
 
 
     private:
-        Vector3d m_origin;
-        Vector3d m_aim_point;
-        Vector3d m_euler_angles;  // euler angles, need to be computed from aim point and zrot
+        Vec3d m_origin;
+        Vec3d m_aim_point;
+        Vec3d m_euler_angles;  // euler angles, need to be computed from aim point and zrot
         double m_zrot; // zrot from the stinput file, user provided value, in degrees
 
-        Vector3d m_upper_box_bound;
-        Vector3d m_lower_box_bound;
+        Vec3d m_upper_box_bound;
+        Vec3d m_lower_box_bound;
 
         std::shared_ptr<Surface> m_surface;
         std::shared_ptr<Aperture> m_aperture;
 
     };
 }
-
-#endif // SOLTRACE_ELEMENT_H

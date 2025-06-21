@@ -1,5 +1,5 @@
 #include "core/soltrace_system.h"
-#include "core/element.h"
+#include "core/CspElement.h"
 #include <iostream>
 #include <stdexcept>
 #include <cstdlib>
@@ -20,13 +20,13 @@ int main(int argc, char* argv[]) {
 	double dim_y = 1.95;
 
 
-	// Element 3
-	Vector3d origin_e2(0, 5, 0); // origin of the element
-	Vector3d aim_point_e2(0, -17.360680, 94.721360); // aim point of the element
+	// CspElement 3
+	Vec3d origin_e2(0, 5, 0); // origin of the CspElement
+	Vec3d aim_point_e2(0, -17.360680, 94.721360); // aim point of the CspElement
 	// z of aimpoint can go all the way to 100 
-	//Vector3d aim_point_e3(0, 0, 9.5);
+	//Vec3d aim_point_e3(0, 0, 9.5);
 
-	auto e2 = std::make_shared<Element>();
+	auto e2 = std::make_shared<CspElement>();
 	e2->set_origin(origin_e2);
 	e2->set_aim_point(aim_point_e2); // Aim direction
 	e2->set_zrot(0.0);
@@ -45,10 +45,10 @@ int main(int argc, char* argv[]) {
 	//////////////////////////////////////////////
 	// STEP 2.1 Create receiver, flat rectangle //
 	//////////////////////////////////////////////
-	Vector3d receiver_origin(0, 0, 10.0); // origin of the receiver
-	Vector3d receiver_aim_point(0, 5, 0.0); // aim point of the receiver
+	Vec3d receiver_origin(0, 0, 10.0); // origin of the receiver
+	Vec3d receiver_aim_point(0, 5, 0.0); // aim point of the receiver
 
-	auto e4 = std::make_shared<Element>();
+	auto e4 = std::make_shared<CspElement>();
 	e4->set_origin(receiver_origin);
 	e4->set_aim_point(receiver_aim_point); // Aim direction
 	e4->set_zrot(0.0); // No rotation for the receiver
@@ -69,7 +69,7 @@ int main(int argc, char* argv[]) {
 	system.add_element(e4); // Add the receiver to the system
 
 	// set up sun vector and angle 
-	Vector3d sun_vector(0.0, -20.0, 100.0); // sun vector
+	Vec3d sun_vector(0.0, -20.0, 100.0); // sun vector
 	//double sun_angle = 0.00465; // 0.00465; // sun angle
 	double sun_angle = 0.0; // 0.00465; // sun angle, set to 0 for this example	
 

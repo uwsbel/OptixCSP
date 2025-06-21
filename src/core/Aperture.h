@@ -8,7 +8,7 @@
 namespace OptixCSP {
     // Forward declarations
     class Element;
-    class Vector3d;
+    class Vec3d;
     class Matrix33d;
 
 
@@ -25,7 +25,7 @@ namespace OptixCSP {
         virtual double get_radius() const;
 
         //// interface for defining the size of the aperture for device data
-        //virtual void compute_device_aperture(Vector3d pos, Vector3d normal) = 0; 
+        //virtual void compute_device_aperture(Vec3d pos, Vec3d normal) = 0; 
 
         // get anchor, v1 and v2
         //virtual float3 get_origin() = 0;

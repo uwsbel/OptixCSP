@@ -8,7 +8,7 @@
 
 using namespace OptixCSP;
 
-void GeometryManager::collect_geometry_info(const std::vector<std::shared_ptr<Element>>& element_list,
+void GeometryManager::collect_geometry_info(const std::vector<std::shared_ptr<CspElement>>& element_list,
                                             LaunchParams& params) {    
     m_aabb_list_H.clear(); // Clear the existing AABB list
     m_sbt_index_H.clear(); // Clear the existing SBT index list
@@ -24,7 +24,7 @@ void GeometryManager::collect_geometry_info(const std::vector<std::shared_ptr<El
 
     for (uint32_t i = 0; i < m_obj_counts; i++) {
 
-		std::shared_ptr<Element> element = element_list[i];
+		std::shared_ptr<CspElement> element = element_list[i];
 
         // Create an OptixAabb from the geometry data
         OptixAabb aabb;
@@ -77,7 +77,7 @@ void GeometryManager::collect_geometry_info(const std::vector<std::shared_ptr<El
 
 
     // add receiver sbt_index
-	std::shared_ptr<Element> receiver = element_list[m_obj_counts - 1];
+	std::shared_ptr<CspElement> receiver = element_list[m_obj_counts - 1];
 
     if (receiver->get_surface_type() == SurfaceType::FLAT) {
         m_sbt_index_H[m_obj_counts -1] = static_cast<uint32_t>(OpticalEntityType::RECTANGLE_FLAT_RECEIVER);
@@ -221,7 +221,7 @@ void GeometryManager::create_geometries(LaunchParams& params) {
 }
 
 
-void GeometryManager::update_geometry_info(const std::vector<std::shared_ptr<Element>>& element_list,
+void GeometryManager::update_geometry_info(const std::vector<std::shared_ptr<CspElement>>& element_list,
 	LaunchParams& params) {
 	// Recollect geometry info
 	collect_geometry_info(element_list, params);

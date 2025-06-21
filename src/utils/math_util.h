@@ -3,7 +3,7 @@
 #include <cmath>
 #include <vector_types.h>
 #include <vector_functions.h>
-#include "Vector3d.h"
+#include "vec3d.h"
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -15,11 +15,11 @@ namespace OptixCSP {
  * Convert normal vector and z-rot to Euler angles (yaw-pitch-roll)
  * @param normal normal direction vector (dx, dy, dz)
  * @param zrot Z-axis rotation in degrees
- * @return Vector3d containing (yaw, pitch, roll) in degrees
+ * @return Vec3d containing (yaw, pitch, roll) in degrees
  */
-inline Vector3d normal_to_euler(const Vector3d& normal, double zrot) {
+inline Vec3d normal_to_euler(const Vec3d& normal, double zrot) {
     // Ensure normal is normalized
-    Vector3d n = normal.normalized();
+    Vec3d n = normal.normalized();
     
     // Calculate Euler angles (SolTrace convention)
     double yaw = atan2(n[0], n[2]);    // Rotation about Y axis (alpha)
@@ -27,7 +27,7 @@ inline Vector3d normal_to_euler(const Vector3d& normal, double zrot) {
     double roll = zrot * M_PI/180.0;   // Rotation about Z axis (gamma), convert to radians
     
     // Convert to degrees
-    return Vector3d(yaw, pitch, roll);
+    return Vec3d(yaw, pitch, roll);
 }
 
 /**
@@ -37,7 +37,7 @@ inline Vector3d normal_to_euler(const Vector3d& normal, double zrot) {
  * @param euler Euler angles (yaw, pitch, roll) in degrees
  * @return Matrix33d rotation matrix (global to local)
  */
-inline Matrix33d get_rotation_matrix_G2L(const Vector3d& euler) {
+inline Matrix33d get_rotation_matrix_G2L(const Vec3d& euler) {
     // Convert to radians
     double alpha = euler[0];  // yaw 
     double beta  = euler[1];  // pitch
@@ -63,11 +63,11 @@ inline Matrix33d get_rotation_matrix_G2L(const Vector3d& euler) {
  * @param point Point in local coordinates
  * @param matrix Global-to-local rotation matrix
  * @param origin Origin of local coordinate system in global coordinates
- * @return Vector3d point in global coordinates
+ * @return Vec3d point in global coordinates
  */
-inline Vector3d local_to_global(const Vector3d& point, const Matrix33d& matrix, const Vector3d& origin) {
+inline Vec3d local_to_global(const Vec3d& point, const Matrix33d& matrix, const Vec3d& origin) {
     // Transpose is handled implicitly by how we access the matrix elements
-    Vector3d rotated(
+    Vec3d rotated(
         matrix(0,0)*point[0] + matrix(1,0)*point[1] + matrix(2,0)*point[2],
         matrix(0,1)*point[0] + matrix(1,1)*point[1] + matrix(2,1)*point[2],
         matrix(0,2)*point[0] + matrix(1,2)*point[1] + matrix(2,2)*point[2]
@@ -83,14 +83,14 @@ inline Vector3d local_to_global(const Vector3d& point, const Matrix33d& matrix, 
  * @param point Point in global coordinates
  * @param matrix Global-to-local rotation matrix
  * @param origin Origin of local coordinate system in global coordinates
- * @return Vector3d point in local coordinates
+ * @return Vec3d point in local coordinates
  */
-inline Vector3d global_to_local(const Vector3d& point, const Matrix33d& matrix, const Vector3d& origin) {
+inline Vec3d global_to_local(const Vec3d& point, const Matrix33d& matrix, const Vec3d& origin) {
     // Translate to origin
-    Vector3d translated = point - origin;
+    Vec3d translated = point - origin;
     
     // Apply global-to-local rotation
-    return Vector3d(
+    return Vec3d(
         matrix(0,0)*translated[0] + matrix(0,1)*translated[1] + matrix(0,2)*translated[2],
         matrix(1,0)*translated[0] + matrix(1,1)*translated[1] + matrix(1,2)*translated[2],
         matrix(2,0)*translated[0] + matrix(2,1)*translated[1] + matrix(2,2)*translated[2]
@@ -98,11 +98,11 @@ inline Vector3d global_to_local(const Vector3d& point, const Matrix33d& matrix, 
 }
 
 /* 
- * convert Vector3d to float3
- * @param v Vector3d to convert
+ * convert Vec3d to float3
+ * @param v Vec3d to convert
  * @return float3
  */
-inline float3 toFloat3(const Vector3d& v) {
+inline float3 toFloat3(const Vec3d& v) {
     return make_float3(static_cast<float>(v[0]), static_cast<float>(v[1]), static_cast<float>(v[2]));
 }
 

@@ -9,16 +9,17 @@
 
 
 #include "core/soltrace_state.h" // SoltraceState
-#include "core/vector3d.h"      // Vector3d
+#include "core/vec3d.h"      // Vec3d
 #include "core/timer.h"
+#include "core/CspElement.h" // CspElement
 
 namespace OptixCSP {
 
     class GeometryManager;
     class pipelineManager;
     class dataManager;
-    class Element;
-    class Vector3d;
+    class CspElement;
+    class Vec3d;
 
     class SolTraceSystem {
     public:
@@ -54,13 +55,13 @@ namespace OptixCSP {
         /// set normalized sun vector
         /// </summary>
         /// <param name="sunVector"></param>
-        void set_sun_vector(OptixCSP::Vector3d vect);
+        void set_sun_vector(OptixCSP::Vec3d vect);
 
         void set_sun_angle(double angle) { m_sun_angle = angle; } // Set the sun angle
 
 
         /// <summary>
-        /// compute number of heliostat elements added to the system 
+        /// compute number of heliostat CspElements added to the system 
         /// </summary>
         /// <returns></returns>
         size_t get_num_heliostats() const
@@ -79,7 +80,7 @@ namespace OptixCSP {
         /// <summary>
         /// add element
         /// /// </summary>
-        void add_element(std::shared_ptr<Element> element);
+        void add_element(std::shared_ptr<CspElement> element);
 
         double get_time_trace();
         double get_time_setup();
@@ -96,11 +97,11 @@ namespace OptixCSP {
         int m_num_sunpoints;
         bool m_verbose;
 
-        OptixCSP::Vector3d m_sun_vector;
+        OptixCSP::Vec3d m_sun_vector;
         double m_sun_angle;
         OptixCSP::SoltraceState m_state;
 
-        std::vector<std::shared_ptr<Element>> m_element_list;
+        std::vector<std::shared_ptr<CspElement>> m_element_list;
         void create_shader_binding_table();
 
         // Helper functions to read a stinput file

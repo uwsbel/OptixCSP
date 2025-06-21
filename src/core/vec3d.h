@@ -1,60 +1,57 @@
-#ifndef SOLTRACE_VECTOR3D_H
-#define SOLTRACE_VECTOR3D_H
-
-
+#pragma once
 #include <iostream>
 #include <cmath>
 
 namespace OptixCSP {
 
-    class Vector3d {
+    class Vec3d {
     public:
         // Constructors.
-        Vector3d() : data{ 0.0, 0.0, 0.0 } {}
-        Vector3d(double x, double y, double z) : data{ x, y, z } {}
+        Vec3d() : data{ 0.0, 0.0, 0.0 } {}
+        Vec3d(double x, double y, double z) : data{ x, y, z } {}
 
         // Access operator (const and non-const).
         double operator[](int i) const { return data[i]; }
         double& operator[](int i) { return data[i]; }
 
         // Addition.
-        Vector3d operator+(const Vector3d& rhs) const {
-            return Vector3d(data[0] + rhs.data[0],
+        Vec3d operator+(const Vec3d& rhs) const {
+            return Vec3d(data[0] + rhs.data[0],
                 data[1] + rhs.data[1],
                 data[2] + rhs.data[2]);
         }
 
         // Subtraction.
-        Vector3d operator-(const Vector3d& rhs) const {
-            return Vector3d(data[0] - rhs.data[0],
+        Vec3d operator-(const Vec3d& rhs) const {
+            return Vec3d(data[0] - rhs.data[0],
                 data[1] - rhs.data[1],
                 data[2] - rhs.data[2]);
         }
 
         // Scalar multiplication.
-        Vector3d operator*(double scalar) const {
-            return Vector3d(data[0] * scalar,
+        Vec3d operator*(double scalar) const {
+            return Vec3d(data[0] * scalar,
                 data[1] * scalar,
                 data[2] * scalar);
         }
 
         // Scalar division.
-        Vector3d operator/(double scalar) const {
-            return Vector3d(data[0] / scalar,
+        Vec3d operator/(double scalar) const {
+            return Vec3d(data[0] / scalar,
                 data[1] / scalar,
                 data[2] / scalar);
         }
 
         // Dot product.
-        double dot(const Vector3d& rhs) const {
+        double dot(const Vec3d& rhs) const {
             return data[0] * rhs.data[0] +
                 data[1] * rhs.data[1] +
                 data[2] * rhs.data[2];
         }
 
         // Cross product.
-        Vector3d cross(const Vector3d& rhs) const {
-            return Vector3d(data[1] * rhs.data[2] - data[2] * rhs.data[1],
+        Vec3d cross(const Vec3d& rhs) const {
+            return Vec3d(data[1] * rhs.data[2] - data[2] * rhs.data[1],
                 data[2] * rhs.data[0] - data[0] * rhs.data[2],
                 data[0] * rhs.data[1] - data[1] * rhs.data[0]);
         }
@@ -65,13 +62,13 @@ namespace OptixCSP {
         }
 
         // Normalized vector.
-        Vector3d normalized() const {
+        Vec3d normalized() const {
             double n = norm();
-            return (n > 0) ? (*this) / n : Vector3d();
+            return (n > 0) ? (*this) / n : Vec3d();
         }
 
         // Output operator for printing.
-        friend std::ostream& operator<<(std::ostream& os, const Vector3d& v) {
+        friend std::ostream& operator<<(std::ostream& os, const Vec3d& v) {
             os << "(" << v.data[0] << ", " << v.data[1] << ", " << v.data[2] << ")";
             return os;
         }
@@ -130,8 +127,8 @@ namespace OptixCSP {
         }
 
         // A * v
-        Vector3d operator*(const Vector3d& v) const {
-            return Vector3d(
+        Vec3d operator*(const Vec3d& v) const {
+            return Vec3d(
                 data[0] * v[0] + data[1] * v[1] + data[2] * v[2],
                 data[3] * v[0] + data[4] * v[1] + data[5] * v[2],
                 data[6] * v[0] + data[7] * v[1] + data[8] * v[2]
@@ -149,14 +146,14 @@ namespace OptixCSP {
         }
 
         // for a rotation matrix, we care about basis vectors
-        Vector3d get_x_basis() const {
-            return Vector3d(data[0], data[3], data[6]);
+        Vec3d get_x_basis() const {
+            return Vec3d(data[0], data[3], data[6]);
         }
-        Vector3d get_y_basis() const {
-            return Vector3d(data[1], data[4], data[7]);
+        Vec3d get_y_basis() const {
+            return Vec3d(data[1], data[4], data[7]);
         }
-        Vector3d get_z_basis() const {
-            return Vector3d(data[2], data[5], data[8]);
+        Vec3d get_z_basis() const {
+            return Vec3d(data[2], data[5], data[8]);
         }
 
 
@@ -170,4 +167,3 @@ namespace OptixCSP {
     // private:
     // };
 }
-#endif

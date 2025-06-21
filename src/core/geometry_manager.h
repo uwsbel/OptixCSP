@@ -8,7 +8,7 @@
 #include <optix.h>
 
 #include "shaders/Soltrace.h"
-#include "element.h"
+#include "CspElement.h"
 #include "soltrace_state.h"
 
 namespace OptixCSP {
@@ -28,7 +28,7 @@ namespace OptixCSP {
 		/// - AABBs
 		/// - GeometryDataST on the host
 		/// - SBT index
-		void collect_geometry_info(const std::vector<std::shared_ptr<Element>>& element_list,
+		void collect_geometry_info(const std::vector<std::shared_ptr<CspElement>>& element_list,
 			LaunchParams& params);
 
 		/// build the GAS (Geometry Acceleration Structure) using the AABB list, populate optix state
@@ -36,7 +36,7 @@ namespace OptixCSP {
 
 
 		/// update the GAS (Geometry Acceleration Structure) using the AABB list, populate optix state
-		void update_geometry_info(const std::vector<std::shared_ptr<Element>>& element_list,
+		void update_geometry_info(const std::vector<std::shared_ptr<CspElement>>& element_list,
 			LaunchParams& params);
 
 		/// return the list of geometry data vector

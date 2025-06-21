@@ -3,7 +3,7 @@
 #include "data_manager.h"
 #include "pipeline_manager.h"
 #include "soltrace_type.h"
-#include "element.h"
+#include "CspElement.h"
 #include "timer.h"
 
 #include "utils/util_record.hpp"
@@ -77,7 +77,7 @@ void SolTraceSystem::initialize() {
     m_timer_setup.start();
 
 
-	Vector3d sun_vec = m_sun_vector.normalized(); // normalize the sun vector
+	Vec3d sun_vec = m_sun_vector.normalized(); // normalize the sun vector
 
     // set up input related to sun
 	data_manager->launch_params_H.sun_vector = OptixCSP::toFloat3(sun_vec);
@@ -423,7 +423,7 @@ void SolTraceSystem::create_shader_binding_table(){
     }
 }
 
-void SolTraceSystem::add_element(std::shared_ptr<Element> e)
+void SolTraceSystem::add_element(std::shared_ptr<CspElement> e)
 {
 
     // update the euler angles for the element
@@ -439,9 +439,9 @@ double SolTraceSystem::get_time_setup() {
 	return m_timer_setup.get_time_sec();
 }
 
-void SolTraceSystem::set_sun_vector(Vector3d vect) {
+void SolTraceSystem::set_sun_vector(Vec3d vect) {
     m_sun_vector = vect;
-    Vector3d sun_v = m_sun_vector.normalized(); // Normalize the sun vector
+    Vec3d sun_v = m_sun_vector.normalized(); // Normalize the sun vector
 	data_manager->launch_params_H.sun_vector = OptixCSP::toFloat3(sun_v);
 }
 
@@ -524,7 +524,7 @@ bool SolTraceSystem::read_sun(FILE* fp) {
 	// 	st_sun_position(cxt, Latitude, Day, Hour, &X, &Y, &Z);
 	// }
 
-    Vector3d sun_vector(X, Y, Z);
+    Vec3d sun_vector(X, Y, Z);
 	set_sun_vector(sun_vector);
 
 	//printf("sun ps? %d cs: %c  %lg %lg %lg\n", PointSource?1:0, cshape, X, Y, Z);
@@ -688,8 +688,8 @@ bool SolTraceSystem::read_element(FILE* fp) {
     }
 
     // st_element_enabled( cxt, istage, ielm,  atoi( tok[0].c_str() ) ? 1 : 0 );
-    auto elem = std::make_shared<Element>();
-    Vector3d origin(atof(tok[1].c_str()),
+    auto elem = std::make_shared<CspElement>();
+    Vec3d origin(atof(tok[1].c_str()),
                     atof(tok[2].c_str()),
                     atof(tok[3].c_str())); // origin of the element
     if (tok[8][0] == 'l' && tok[17][0] == 't')
@@ -697,7 +697,7 @@ bool SolTraceSystem::read_element(FILE* fp) {
         // Cylindrical element, offset y coordinate by radius to center the cylinder
         origin[1] += 1 / atof(tok[18].c_str()); // tok[18] is 1 / radius
     }
-    Vector3d aim_point(atof(tok[4].c_str()),
+    Vec3d aim_point(atof(tok[4].c_str()),
                        atof(tok[5].c_str()),
                        atof(tok[6].c_str())); // aim point of the element
     double zrot = atof(tok[7].c_str());       // z rotation of the element
