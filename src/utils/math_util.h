@@ -9,7 +9,7 @@
 #define M_PI 3.14159265358979323846
 #endif
 
-namespace mathUtil {
+namespace OptixCSP {
 
 /**
  * Convert normal vector and z-rot to Euler angles (yaw-pitch-roll)

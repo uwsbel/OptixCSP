@@ -35,83 +35,85 @@
 #include <sstream>
 #include <iostream>
 
-// ------------------------------------------------------------
-// Simple error checker (no log buffer)
-inline void optixCheck(OptixResult   res,
-    const char* func,
-    const char* file,
-    unsigned int  line)
-{
-    if (res != OPTIX_SUCCESS)
+namespace OptixCSP {
+    // ------------------------------------------------------------
+    // Simple error checker (no log buffer)
+    inline void optixCheck(OptixResult   res,
+        const char* func,
+        const char* file,
+        unsigned int  line)
     {
-        std::ostringstream oss;
-        oss << "OptiX call (" << func << ") failed with code "
-            << static_cast<int>(res) << " at " << file << ":" << line;
-        throw std::runtime_error(oss.str());
+        if (res != OPTIX_SUCCESS)
+        {
+            std::ostringstream oss;
+            oss << "OptiX call (" << func << ") failed with code "
+                << static_cast<int>(res) << " at " << file << ":" << line;
+            throw std::runtime_error(oss.str());
+        }
     }
-}
 
-inline void cudaCheck(cudaError_t error, const char* call, const char* file, unsigned int line)
-{
-    if (error != cudaSuccess)
+    inline void cudaCheck(cudaError_t error, const char* call, const char* file, unsigned int line)
     {
-        std::stringstream ss;
-        ss << "CUDA call (" << call << " ) failed with error: '"
-            << cudaGetErrorString(error) << "' (" << file << ":" << line << ")\n";
-        throw std::runtime_error(ss.str().c_str());
+        if (error != cudaSuccess)
+        {
+            std::stringstream ss;
+            ss << "CUDA call (" << call << " ) failed with error: '"
+                << cudaGetErrorString(error) << "' (" << file << ":" << line << ")\n";
+            throw std::runtime_error(ss.str().c_str());
+        }
     }
-}
-
-
-// ------------------------------------------------------------
-// Error checker WITH log buffer
-inline void optixCheckLog(OptixResult  res,
-    const char* log,
-    size_t       sizeof_log,
-    size_t       log_size,
-    const char* func,
-    const char* file,
-    unsigned int line)
-{
-    if (res != OPTIX_SUCCESS)
-    {
-        std::ostringstream oss;
-        oss << "OptiX call (" << func << ") failed with code "
-            << static_cast<int>(res) << " at " << file << ":" << line
-            << "\nLog (" << log_size << " bytes):\n"
-            << std::string(log, log + log_size);
-        throw std::runtime_error(oss.str());
-    }
-    else if (log_size > 1)
-    {
-        std::cerr << "OptiX log for " << func << ":\n"
-            << std::string(log, log + log_size) << std::endl;
-    }
-}
 
 
-inline void cudaSyncCheck(const char* file, unsigned int line)
-{
-    cudaDeviceSynchronize();
-    cudaError_t error = cudaGetLastError();
-    if (error != cudaSuccess)
+    // ------------------------------------------------------------
+    // Error checker WITH log buffer
+    inline void optixCheckLog(OptixResult  res,
+        const char* log,
+        size_t       sizeof_log,
+        size_t       log_size,
+        const char* func,
+        const char* file,
+        unsigned int line)
     {
-        std::stringstream ss;
-        ss << "CUDA error on synchronize with error '"
-            << cudaGetErrorString(error) << "' (" << file << ":" << line << ")\n";
-        throw std::runtime_error(ss.str().c_str());
+        if (res != OPTIX_SUCCESS)
+        {
+            std::ostringstream oss;
+            oss << "OptiX call (" << func << ") failed with code "
+                << static_cast<int>(res) << " at " << file << ":" << line
+                << "\nLog (" << log_size << " bytes):\n"
+                << std::string(log, log + log_size);
+            throw std::runtime_error(oss.str());
+        }
+        else if (log_size > 1)
+        {
+            std::cerr << "OptiX log for " << func << ":\n"
+                << std::string(log, log + log_size) << std::endl;
+        }
     }
-}
+
+
+    inline void cudaSyncCheck(const char* file, unsigned int line)
+    {
+        cudaDeviceSynchronize();
+        cudaError_t error = cudaGetLastError();
+        if (error != cudaSuccess)
+        {
+            std::stringstream ss;
+            ss << "CUDA error on synchronize with error '"
+                << cudaGetErrorString(error) << "' (" << file << ":" << line << ")\n";
+            throw std::runtime_error(ss.str().c_str());
+        }
+    }
 
 #define OPTIX_CHECK( call ) optixCheck( (call), #call, __FILE__, __LINE__ )
 #define OPTIX_CHECK_LOG( call )                                   \
-    do {                                                          \
-        char   LOG_[2048] = {};                                   \
-        size_t LOG_SIZE_  = sizeof( LOG_ );                       \
-        optixCheckLog( (call), LOG_, sizeof( LOG_ ),              \
-                       LOG_SIZE_, #call,                          \
-                       __FILE__, __LINE__ );                      \
-    } while( false )
+        do {                                                          \
+            char   LOG_[2048] = {};                                   \
+            size_t LOG_SIZE_  = sizeof( LOG_ );                       \
+            optixCheckLog( (call), LOG_, sizeof( LOG_ ),              \
+                           LOG_SIZE_, #call,                          \
+                           __FILE__, __LINE__ );                      \
+        } while( false )
 
 #define CUDA_CHECK( call ) cudaCheck( call, #call, __FILE__, __LINE__ )
 #define CUDA_SYNC_CHECK() cudaSyncCheck( __FILE__, __LINE__ )
+}

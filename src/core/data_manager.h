@@ -2,44 +2,42 @@
 #ifndef DATAMANAGER_H
 #define DATAMANAGER_H
 
-#include "../shaders/Soltrace.h"
+#include "shaders/Soltrace.h"
 #include "element.h"
 #include <vector>
 
-using namespace soltrace;
+namespace OptixCSP {
 
+    // Class to manage data on the host and device.
+    class dataManager {
+    public:
+        // TODO: move this to private member for best practice 
+        // Host copy of launch parameters.
+        OptixCSP::LaunchParams launch_params_H;
+        // Device pointer to launch parameters.
+        OptixCSP::LaunchParams* launch_params_D;
 
-// Class to manage data on the host and device.
+        // device pointer to geometry data
+        GeometryDataST* geometry_data_array_D;
 
-class dataManager {
-public:
-    // TODO: move this to private member for best practice 
-    // Host copy of launch parameters.
-    soltrace::LaunchParams launch_params_H;
-    // Device pointer to launch parameters.
-    soltrace::LaunchParams* launch_params_D;
+        dataManager();
+        ~dataManager();
 
-	// device pointer to geometry data
-    GeometryDataST* geometry_data_array_D;
+        void cleanup();
 
-    dataManager();
-    ~dataManager();
+        OptixCSP::LaunchParams* getDeviceLaunchParams() const;
 
-    void cleanup();
+        void allocateLaunchParams();
 
-    soltrace::LaunchParams* getDeviceLaunchParams() const;
+        void updateLaunchParams();
 
-    void allocateLaunchParams();
+        // create geometry_data_array_D on the device
+        // then launch_params_D.geometry_data_array = geometry_data_array_D gets a copy.
+        void allocateGeometryDataArray(std::vector<GeometryDataST> geometry_data_array);
 
-    void updateLaunchParams();
-
-	// create geometry_data_array_D on the device
-	// then launch_params_D.geometry_data_array = geometry_data_array_D gets a copy.
-	void allocateGeometryDataArray(std::vector<GeometryDataST> geometry_data_array);
-
-	// update geometry_data_array_D on the device
-	// then launch_params_D.geometry_data_array = geometry_data_array_D gets a copy.
-	void updateGeometryDataArray(std::vector<GeometryDataST> geometry_data_array_H);
-};
-
+        // update geometry_data_array_D on the device
+        // then launch_params_D.geometry_data_array = geometry_data_array_D gets a copy.
+        void updateGeometryDataArray(std::vector<GeometryDataST> geometry_data_array_H);
+    };
+}
 #endif  // DATAMANAGER_H

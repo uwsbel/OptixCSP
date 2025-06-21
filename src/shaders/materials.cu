@@ -2,30 +2,35 @@
 #include <vector_types.h>
 #include "Soltrace.h"
 
-//TODO: closeshit should not be dependent on geometry!!!!!!!!!!!!
+
+namespace OptixCSP {
+    static __device__ __inline__ OptixCSP::PerRayData getPayload()
+    {
+        OptixCSP::PerRayData prd;
+        prd.ray_path_index = optixGetPayload_0();
+        prd.depth = optixGetPayload_1();
+        return prd;
+    }
+
+    static __device__ __inline__ void setPayload(const OptixCSP::PerRayData& prd)
+    {
+        optixSetPayload_0(prd.ray_path_index);
+        optixSetPayload_1(prd.depth);
+    }
+
+}
+
+
+
 
 // Launch parameters for soltrace
 extern "C" {
-    __constant__ soltrace::LaunchParams params;
-}
-
-static __device__ __inline__ soltrace::PerRayData getPayload()
-{
-    soltrace::PerRayData prd;
-    prd.ray_path_index = optixGetPayload_0();
-    prd.depth = optixGetPayload_1();
-    return prd;
-}
-
-static __device__ __inline__ void setPayload(const soltrace::PerRayData& prd)
-{
-    optixSetPayload_0(prd.ray_path_index);
-    optixSetPayload_1(prd.depth);
+    __constant__ OptixCSP::LaunchParams params;
 }
 
 extern "C" __global__ void __closesthit__mirror()
 {
-    //const soltrace::HitGroupData* sbt_data = reinterpret_cast<soltrace::HitGroupData*>(optixGetSbtDataPointer());
+    //const OptixCSP::HitGroupData* sbt_data = reinterpret_cast<OptixCSP::HitGroupData*>(optixGetSbtDataPointer());
     //const MaterialData::Mirror& mirror = sbt_data->material_data.mirror;
 
     // Fetch the normal vector from the hit attributes passed by OptiX
@@ -44,7 +49,7 @@ extern "C" __global__ void __closesthit__mirror()
     // Compute the hit point of the ray using its origin and direction, scaled by the intersection distance (ray_t)
     const float3 hit_point = ray_orig + ray_t * ray_dir;
 
-    soltrace::PerRayData prd = getPayload();
+    OptixCSP::PerRayData prd = OptixCSP::getPayload();
     const int new_depth = prd.depth + 1;    // Increment the ray depth for recursive tracing
 
     // Calculate ideal reflection direction using OptiX's built-in reflect function
@@ -72,9 +77,9 @@ extern "C" __global__ void __closesthit__mirror()
             0.0f,                   // Ray time (used for time-dependent effects)
             OptixVisibilityMask(1), // Visibility mask (defines what the ray can interact with)
             OPTIX_RAY_FLAG_NONE,    // Ray flags (no special flags for now)
-            soltrace::RAY_TYPE_RADIANCE,  // Use the radiance ray type
-            soltrace::RAY_TYPE_COUNT,     // Total number of ray types
-            soltrace::RAY_TYPE_RADIANCE,  // The ray type's offset into the SBT
+            OptixCSP::RAY_TYPE_RADIANCE,  // Use the radiance ray type
+            OptixCSP::RAY_TYPE_COUNT,     // Total number of ray types
+            OptixCSP::RAY_TYPE_RADIANCE,  // The ray type's offset into the SBT
             reinterpret_cast<unsigned int&>(prd.ray_path_index), // Pass the ray path index
             reinterpret_cast<unsigned int&>(prd.depth)           // Pass the updated depth
         );
@@ -85,7 +90,7 @@ extern "C" __global__ void __closesthit__mirror()
 
 extern "C" __global__ void __closesthit__receiver()
 {
-    const GeometryDataST::Rectangle_Flat& rectangle_flat = params.geometry_data_array[optixGetPrimitiveIndex()].getRectangle_Flat();
+    const OptixCSP::GeometryDataST::Rectangle_Flat& rectangle_flat = params.geometry_data_array[optixGetPrimitiveIndex()].getRectangle_Flat();
 
     /*
     float3 object_normal = make_float3( __uint_as_float( optixGetAttribute_0() ), __uint_as_float( optixGetAttribute_1() ),
@@ -106,7 +111,7 @@ extern "C" __global__ void __closesthit__receiver()
 
     float3 hit_point = ray_orig + ray_t * ray_dir;
 
-    soltrace::PerRayData prd = getPayload();
+    OptixCSP::PerRayData prd = OptixCSP::getPayload();
     const int new_depth = prd.depth + 1;
 
     // Check if the ray hits the receiver surface (dot product negative means ray is hitting the front face)
@@ -123,11 +128,11 @@ extern "C" __global__ void __closesthit__receiver()
 extern "C" __global__ void __closesthit__receiver__cylinder__y()
 {
     //// Retrieve the hit group data and access the parallelogram geometry
-    //const soltrace::HitGroupData* sbt_data = reinterpret_cast<soltrace::HitGroupData*>(optixGetSbtDataPointer());
+    //const OptixCSP::HitGroupData* sbt_data = reinterpret_cast<OptixCSP::HitGroupData*>(optixGetSbtDataPointer());
 
     
 
-    const GeometryDataST::Cylinder_Y& cyl = params.geometry_data_array[optixGetPrimitiveIndex()].getCylinder_Y();
+    const OptixCSP::GeometryDataST::Cylinder_Y& cyl = params.geometry_data_array[optixGetPrimitiveIndex()].getCylinder_Y();
 
     /*
     float3 object_normal = make_float3( __uint_as_float( optixGetAttribute_0() ), __uint_as_float( optixGetAttribute_1() ),
@@ -148,7 +153,7 @@ extern "C" __global__ void __closesthit__receiver__cylinder__y()
 
     float3 hit_point = ray_orig + ray_t * ray_dir;
 
-    soltrace::PerRayData prd = getPayload();
+    OptixCSP::PerRayData prd = OptixCSP::getPayload();
     const int new_depth = prd.depth + 1;
 
     // Check if the ray hits the receiver surface (dot product negative means ray is hitting the front face)
@@ -170,7 +175,7 @@ extern "C" __global__ void __closesthit__receiver__cylinder__y()
 extern "C" __global__ void __closesthit__mirror__parabolic()
 {
     // Optionally, you can access material data if needed:
-    // const soltrace::HitGroupData* sbt_data = reinterpret_cast<soltrace::HitGroupData*>( optixGetSbtDataPointer() );
+    // const OptixCSP::HitGroupData* sbt_data = reinterpret_cast<OptixCSP::HitGroupData*>( optixGetSbtDataPointer() );
     // const MaterialData::Mirror& mirror = sbt_data->material_data.mirror;
 
     // Retrieve the hit normal from the attributes.
@@ -195,7 +200,7 @@ extern "C" __global__ void __closesthit__mirror__parabolic()
     const float3 hit_point = ray_orig + ray_t * ray_dir;
 
     // Retrieve per�ray payload.
-    soltrace::PerRayData prd = getPayload();
+    OptixCSP::PerRayData prd = OptixCSP::getPayload();
     const int new_depth = prd.depth + 1; // Increase recursion depth.
 
     // Compute the reflected ray direction.
@@ -218,9 +223,9 @@ extern "C" __global__ void __closesthit__mirror__parabolic()
             0.0f,                   // Ray time.
             OptixVisibilityMask(1), // Visibility mask.
             OPTIX_RAY_FLAG_NONE,    // Ray flags.
-            soltrace::RAY_TYPE_RADIANCE,  // Ray type.
-            soltrace::RAY_TYPE_COUNT,     // Number of ray types.
-            soltrace::RAY_TYPE_RADIANCE,  // SBT offset for this ray type.
+            OptixCSP::RAY_TYPE_RADIANCE,  // Ray type.
+            OptixCSP::RAY_TYPE_COUNT,     // Number of ray types.
+            OptixCSP::RAY_TYPE_RADIANCE,  // SBT offset for this ray type.
             reinterpret_cast<unsigned int&>(prd.ray_path_index), // Ray path index.
             reinterpret_cast<unsigned int&>(prd.depth)           // Current recursion depth.
         );
@@ -239,7 +244,7 @@ extern "C" __global__ void __miss__ms()
     // This function simply acts as a terminator for rays that miss all geometry.
     
     /*
-    soltrace::PerRayData prd = getPayload();
+    OptixCSP::PerRayData prd = getPayload();
     const int new_depth = prd.depth + 1;
 
     if (new_depth < params.max_depth) {

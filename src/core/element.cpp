@@ -10,6 +10,9 @@
 #include "element.h"
 #include "vector"
 
+
+using namespace OptixCSP;
+
 ElementBase::ElementBase() {}
 
 Element::Element() {
@@ -77,13 +80,13 @@ void Element::set_surface(const std::shared_ptr<Surface>& surface)
 void Element::update_euler_angles(const Vector3d& aim_point, const double zrot) {
     Vector3d normal = aim_point - m_origin;
     normal.normalized();
-    m_euler_angles = mathUtil::normal_to_euler(normal, zrot);
+    m_euler_angles = OptixCSP::normal_to_euler(normal, zrot);
 }
 
 void Element::update_euler_angles() {
     Vector3d normal = m_aim_point - m_origin;
     normal.normalized();
-    m_euler_angles = mathUtil::normal_to_euler(normal, m_zrot);
+    m_euler_angles = OptixCSP::normal_to_euler(normal, m_zrot);
 }
 
 void Element::update_element(const Vector3d& aim_point, const double zrot) {
@@ -95,7 +98,7 @@ void Element::update_element(const Vector3d& aim_point, const double zrot) {
 Matrix33d Element::get_rotation_matrix() const {
     // get G2L rotation matrix from euler angles 
     // TODO: need to think about if we store this or not
-    Matrix33d mat_G2L = mathUtil::get_rotation_matrix_G2L(m_euler_angles);
+    Matrix33d mat_G2L = OptixCSP::get_rotation_matrix_G2L(m_euler_angles);
     return mat_G2L.transpose();
 }
 
@@ -129,15 +132,15 @@ GeometryDataST Element::toDeviceGeometryData() const {
         Vector3d v2 = rotation_matrix.get_y_basis();
 
         if (surface_type == SurfaceType::FLAT) {
-            GeometryDataST::Rectangle_Flat heliostat(mathUtil::toFloat3(m_origin), mathUtil::toFloat3(v1), mathUtil::toFloat3(v2), (float)width, (float)height);
+            GeometryDataST::Rectangle_Flat heliostat(OptixCSP::toFloat3(m_origin), OptixCSP::toFloat3(v1), OptixCSP::toFloat3(v2), (float)width, (float)height);
             geometry_data.setRectangle_Flat(heliostat);
         }
 
         if (surface_type == SurfaceType::PARABOLIC) {
 			v1 = v1 * (float)(-width);
 			v2 = v2 * (float)height;
-			float3 anchor = mathUtil::toFloat3(m_origin - v1 * 0.5 - v2 * 0.5);
-            GeometryDataST::Rectangle_Parabolic heliostat(mathUtil::toFloat3(v1), mathUtil::toFloat3(v2),  anchor,
+			float3 anchor = OptixCSP::toFloat3(m_origin - v1 * 0.5 - v2 * 0.5);
+            GeometryDataST::Rectangle_Parabolic heliostat(OptixCSP::toFloat3(v1), OptixCSP::toFloat3(v2),  anchor,
                 (float)m_surface->get_curvature_1(),
                 (float)m_surface->get_curvature_2());
             geometry_data.setRectangleParabolic(heliostat);
@@ -147,12 +150,12 @@ GeometryDataST Element::toDeviceGeometryData() const {
             float radius = static_cast<float>(width) / 2.0f;
             float half_height = static_cast<float>(height) / 2.0f;
 
-			float3 center = mathUtil::toFloat3(m_origin);
+			float3 center = OptixCSP::toFloat3(m_origin);
 			Matrix33d rotation_matrix = get_rotation_matrix();  // L2G rotation matrix
 
-			float3 base_x = mathUtil::toFloat3(rotation_matrix.get_x_basis());
+			float3 base_x = OptixCSP::toFloat3(rotation_matrix.get_x_basis());
 
-			float3 base_z = mathUtil::toFloat3(rotation_matrix.get_z_basis());
+			float3 base_z = OptixCSP::toFloat3(rotation_matrix.get_z_basis());
 
 			GeometryDataST::Cylinder_Y heliostat(center, radius, half_height, base_x, base_z);
 

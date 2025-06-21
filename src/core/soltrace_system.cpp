@@ -15,10 +15,10 @@
 #include <optix_function_table_definition.h>
 #include <optix_stubs.h>
 
-using namespace soltrace;
+using namespace OptixCSP;
 
 // TODO: optix related type should go into one header file
-typedef Record<soltrace::HitGroupData> HitGroupRecord;
+typedef Record<OptixCSP::HitGroupData> HitGroupRecord;
 
 void SolTraceSystem::print_launch_params() {
 
@@ -80,7 +80,7 @@ void SolTraceSystem::initialize() {
 	Vector3d sun_vec = m_sun_vector.normalized(); // normalize the sun vector
 
     // set up input related to sun
-	data_manager->launch_params_H.sun_vector = mathUtil::toFloat3(sun_vec);
+	data_manager->launch_params_H.sun_vector = OptixCSP::toFloat3(sun_vec);
     data_manager->launch_params_H.max_sun_angle = (float)(m_sun_angle);
 
     Timer AABB_timer;
@@ -156,7 +156,7 @@ void SolTraceSystem::run() {
         m_state.pipeline,
         m_state.stream,  // Assume this stream is properly created.
         reinterpret_cast<CUdeviceptr>(data_manager->getDeviceLaunchParams()),
-        sizeof(soltrace::LaunchParams),
+        sizeof(OptixCSP::LaunchParams),
 		&m_state.sbt,    // Shader Binding Table.
         width,  // Launch dimensions
         height,
@@ -332,61 +332,61 @@ void SolTraceSystem::create_shader_binding_table(){
 
         CUDA_CHECK(cudaMalloc(
             reinterpret_cast<void**>(&d_miss_record),
-            sizeof_miss_record * soltrace::RAY_TYPE_COUNT));
+            sizeof_miss_record * OptixCSP::RAY_TYPE_COUNT));
 
-        EmptyRecord ms_sbt[soltrace::RAY_TYPE_COUNT];
+        EmptyRecord ms_sbt[OptixCSP::RAY_TYPE_COUNT];
         // Pack the program header into the first miss SBT record.
         optixSbtRecordPackHeader(m_state.radiance_miss_prog_group, &ms_sbt[0]);
 
         CUDA_CHECK(cudaMemcpy(
             reinterpret_cast<void*>(d_miss_record),
             ms_sbt,
-            sizeof_miss_record * soltrace::RAY_TYPE_COUNT,
+            sizeof_miss_record * OptixCSP::RAY_TYPE_COUNT,
             cudaMemcpyHostToDevice
         ));
 
         // Configure the SBT miss program fields.
         m_state.sbt.missRecordBase = d_miss_record;                   // Base address of the miss records.
-        m_state.sbt.missRecordCount = soltrace::RAY_TYPE_COUNT;        // Number of miss records.
+        m_state.sbt.missRecordCount = OptixCSP::RAY_TYPE_COUNT;        // Number of miss records.
         m_state.sbt.missRecordStrideInBytes = static_cast<uint32_t>(sizeof_miss_record);    // Stride between miss records.
     }
 
     // Hitgroup program record
     {
         // Total number of hitgroup records is the number of optical entity types
-        const unsigned int count_records = soltrace::NUM_OPTICAL_ENTITY_TYPES;
+        const unsigned int count_records = OptixCSP::NUM_OPTICAL_ENTITY_TYPES;
         std::vector<HitGroupRecord> hitgroup_records_list(count_records);
 
         // now we need to populate hitgroup_records_list, basically match the 
 		// OpticalEntityType with the corresponding m_program_group
         for (unsigned int i = 0; i < count_records; i++) {
 
-			soltrace::OpticalEntityType my_type = static_cast<soltrace::OpticalEntityType>(i);
+			OptixCSP::OpticalEntityType my_type = static_cast<OptixCSP::OpticalEntityType>(i);
             // initialize program handle and data
             OptixProgramGroup program_group_handle = nullptr;
             SurfaceApertureMap map = {};
 
 			switch (my_type) {
-            case soltrace::OpticalEntityType::RECTANGLE_FLAT_MIRROR: 
+            case OptixCSP::OpticalEntityType::RECTANGLE_FLAT_MIRROR: 
 				map = { SurfaceType::FLAT, ApertureType::RECTANGLE };
                 program_group_handle = pipeline_manager->getMirrorProgram(map);
                 hitgroup_records_list[i].data.material_data.mirror = {0.875425, 0, 0, 0};
                 printf("RECTANGLE_FLAT_MIRROR, program group address: %p \n", program_group_handle);
 				break;
-            case soltrace::OpticalEntityType::RECTANGLE_PARABOLIC_MIRROR:
+            case OptixCSP::OpticalEntityType::RECTANGLE_PARABOLIC_MIRROR:
                 map = { SurfaceType::PARABOLIC, ApertureType::RECTANGLE };
                 program_group_handle = pipeline_manager->getMirrorProgram(map);
                 hitgroup_records_list[i].data.material_data.mirror = { 0.875425, 0, 0, 0 };
                 printf("RECTANGLE_PARABOLIC_MIRROR, program group address: %p \n", program_group_handle);
 
                 break;
-            case soltrace::OpticalEntityType::RECTANGLE_FLAT_RECEIVER:
+            case OptixCSP::OpticalEntityType::RECTANGLE_FLAT_RECEIVER:
                 program_group_handle = pipeline_manager->getReceiverProgram(SurfaceType::FLAT);
 				hitgroup_records_list[i].data.material_data.receiver = { 0.95, 0, 0, 0 };
                 printf("RECTANGLE_FLAT_RECEIVER, program group address: %p \n", program_group_handle);
 
                 break;
-            case soltrace::OpticalEntityType::CYLINDRICAL_RECEIVER:
+            case OptixCSP::OpticalEntityType::CYLINDRICAL_RECEIVER:
                 program_group_handle = pipeline_manager->getReceiverProgram(SurfaceType::CYLINDER);
                 hitgroup_records_list[i].data.material_data.receiver = { 0.95, 0, 0, 0 };
                 printf("CYLINDRICAL_RECEIVER, program group address: %p \n", program_group_handle);
@@ -442,7 +442,7 @@ double SolTraceSystem::get_time_setup() {
 void SolTraceSystem::set_sun_vector(Vector3d vect) {
     m_sun_vector = vect;
     Vector3d sun_v = m_sun_vector.normalized(); // Normalize the sun vector
-	data_manager->launch_params_H.sun_vector = mathUtil::toFloat3(sun_v);
+	data_manager->launch_params_H.sun_vector = OptixCSP::toFloat3(sun_v);
 }
 
 std::vector<std::string> SolTraceSystem::split(const std::string& str, const std::string& delim, bool ret_empty, bool ret_delim) {

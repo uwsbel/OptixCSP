@@ -6,6 +6,8 @@
 #include "data_manager.h"
 #include <vector>
 
+using namespace OptixCSP;
+
 void GeometryManager::collect_geometry_info(const std::vector<std::shared_ptr<Element>>& element_list,
                                             LaunchParams& params) {    
     m_aabb_list_H.clear(); // Clear the existing AABB list

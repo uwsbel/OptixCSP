@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <cstdlib>
 using namespace std;
+using namespace OptixCSP;
 
 int main(int argc, char* argv[]) {
     bool parabolic = true; // Set to true for parabolic mirrors, false for flat mirrors

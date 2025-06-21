@@ -4,6 +4,8 @@
 #include <stdexcept>
 #include <cstdlib>
 
+using namespace OptixCSP;
+
 int main(int argc, char* argv[]) {
 
 	// parabolic mirror, cylindrical receiver

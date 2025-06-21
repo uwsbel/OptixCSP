@@ -1,5 +1,7 @@
 #include "aperture.h"
 
+using namespace OptixCSP;
+
 class Element;
 
 // Aperture base class implementations

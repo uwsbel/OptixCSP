@@ -5,14 +5,14 @@
 #include "GeometryDataST.h"
 
 extern "C" {
-    __constant__ soltrace::LaunchParams params;
+    __constant__ OptixCSP::LaunchParams params;
 }
 
 
 extern "C" __global__ void __intersection__parallelogram()
 {
 	int i = optixGetPrimitiveIndex();
-    const GeometryDataST::Parallelogram& parallelogram = params.geometry_data_array[i].getParallelogram();
+    const OptixCSP::GeometryDataST::Parallelogram& parallelogram = params.geometry_data_array[i].getParallelogram();
         
     // Get ray information: origin, direction, and min/max distances over which ray should be tested
     const float3 ray_orig = optixGetWorldRayOrigin();
@@ -46,7 +46,7 @@ extern "C" __global__ void __intersection__parallelogram()
 extern "C" __global__ void __intersection__rectangle_flat()
 {
 
-	const GeometryDataST::Rectangle_Flat& rectangle = params.geometry_data_array[optixGetPrimitiveIndex()].getRectangle_Flat();
+	const OptixCSP::GeometryDataST::Rectangle_Flat& rectangle = params.geometry_data_array[optixGetPrimitiveIndex()].getRectangle_Flat();
         
     const float3 ray_orig = optixGetWorldRayOrigin();
     const float3 ray_dir = optixGetWorldRayDirection();
@@ -85,7 +85,7 @@ extern "C" __global__ void __intersection__rectangle_flat()
 
 extern "C" __global__ void __intersection__cylinder_y()
 {
-	const GeometryDataST::Cylinder_Y& cyl = params.geometry_data_array[optixGetPrimitiveIndex()].getCylinder_Y();
+	const OptixCSP::GeometryDataST::Cylinder_Y& cyl = params.geometry_data_array[optixGetPrimitiveIndex()].getCylinder_Y();
 
     // Get ray information: origin, direction, and min/max distances over which ray should be tested
     const float3 ray_orig = optixGetWorldRayOrigin();
@@ -175,7 +175,7 @@ extern "C" __global__ void __intersection__cylinder_y()
 // it can also be modeled as cylinder with two disks. 
 extern "C" __global__ void __intersection__cylinder_y_capped()
 {
-	const GeometryDataST::Cylinder_Y& cyl = params.geometry_data_array[optixGetPrimitiveIndex()].getCylinder_Y();
+	const OptixCSP::GeometryDataST::Cylinder_Y& cyl = params.geometry_data_array[optixGetPrimitiveIndex()].getCylinder_Y();
 
     // Get ray information: origin, direction, and min/max distances over which ray should be tested
     const float3 ray_orig = optixGetWorldRayOrigin();
@@ -316,7 +316,7 @@ extern "C" __global__ void __intersection__cylinder_y_capped()
 // The local hit point is then transformed back to world space for reporting.
 extern "C" __global__ void __intersection__rectangle_parabolic()
 {
-    const GeometryDataST::Rectangle_Parabolic& rect = params.geometry_data_array[optixGetPrimitiveIndex()].getRectangleParabolic();
+    const OptixCSP::GeometryDataST::Rectangle_Parabolic& rect = params.geometry_data_array[optixGetPrimitiveIndex()].getRectangleParabolic();
     // Get ray information.
     const float3 ray_orig = optixGetWorldRayOrigin();
     const float3 ray_dir = optixGetWorldRayDirection();

@@ -13,6 +13,7 @@
 #include "pipeline_manager.h"
 #include <fstream>
 
+using namespace OptixCSP;
 
 char LOG[2048] = {};   // A mutable log buffer.
 size_t LOG_SIZE = sizeof(LOG);
