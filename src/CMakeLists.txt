@@ -91,3 +91,23 @@ configure_file(
     ../sampleConfig.h.in               # contains:  #define SAMPLES_PTX_DIR "@PTX_OUTPUT_DIR@/"
     ${CMAKE_CURRENT_BINARY_DIR}/sampleConfig.h
     @ONLY)
+
+
+# ---------------------------------------------------------------------------
+# export targets for linking to third-party projects
+# ---------------------------------------------------------------------------
+set(OptixCSP_EXPORT_CONFIG_DIR "${CMAKE_BINARY_DIR}/cmake/")
+
+export(TARGETS OptixCSP_core
+       FILE ${OptixCSP_EXPORT_CONFIG_DIR}/OptixCSPTargets.cmake
+       NAMESPACE OptixCSP::
+)
+
+# Generate Config file
+include(CMakePackageConfigHelpers)
+
+configure_package_config_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/../cmake/OptixCSPConfig.cmake.in
+    ${OptixCSP_EXPORT_CONFIG_DIR}/OptixCSPConfig.cmake
+    INSTALL_DESTINATION lib/cmake/OptixCSP
+)
