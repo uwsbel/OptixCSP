@@ -1,6 +1,4 @@
 #pragma once
-#ifndef DATAMANAGER_H
-#define DATAMANAGER_H
 
 #include "shaders/Soltrace.h"
 #include "CspElement.h"
@@ -40,4 +38,3 @@ namespace OptixCSP {
         void updateGeometryDataArray(std::vector<GeometryDataST> geometry_data_array_H);
     };
 }
-#endif  // DATAMANAGER_H

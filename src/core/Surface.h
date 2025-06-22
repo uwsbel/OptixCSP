@@ -1,6 +1,4 @@
-#ifndef SOLTRACE_SURFACE_H
-#define SOLTRACE_SURFACE_H
-
+#pragma once
 #include "soltrace_type.h"    // For SurfaceType enum
 
 namespace OptixCSP
@@ -110,4 +108,3 @@ namespace OptixCSP
     };
 
 }
-#endif // SOLTRACE_SURFACE_H

@@ -1,7 +1,3 @@
-#ifndef GEOMETRYMANAGER_H
-#define GEOMETRYMANAGER_H
-
-
 #include <string>
 #include <vector>
 #include <cuda_runtime.h>
@@ -68,4 +64,3 @@ namespace OptixCSP {
 		size_t m_temp_buffer_size = 0;     // size of the output buffer
 	};
 }
-#endif // GEOMETRY_MANAGER_H

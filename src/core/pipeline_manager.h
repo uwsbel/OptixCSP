@@ -1,7 +1,4 @@
 #pragma once
-#ifndef PIPELINEMANAGER_H
-#define PIPELINEMANAGER_H
-
 #include <string>
 #include <vector>
 #include "optix.h"
@@ -136,5 +133,3 @@ namespace OptixCSP {
         int num_miss_programs = 1; ///< Number of miss programs.
     };
 }
-
-#endif  // PIPELINEMANAGER_H

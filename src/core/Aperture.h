@@ -1,7 +1,4 @@
 #pragma once
-#ifndef SOLTRACE_APERTURE_H
-#define SOLTRACE_APERTURE_H
-
 #include "soltrace_type.h"  // For ApertureType enum
 
 
@@ -73,5 +70,3 @@ namespace OptixCSP {
     };
 
 }
-
-#endif // SOLTRACE_APERTURE_H

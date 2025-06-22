@@ -12,6 +12,7 @@
 #include "core/vec3d.h"      // Vec3d
 #include "core/timer.h"
 #include "core/CspElement.h" // CspElement
+#include "core/surface.h"    // Surface and derived classes
 
 namespace OptixCSP {
 
@@ -20,6 +21,7 @@ namespace OptixCSP {
     class dataManager;
     class CspElement;
     class Vec3d;
+    class Surface;
 
     class SolTraceSystem {
     public:
