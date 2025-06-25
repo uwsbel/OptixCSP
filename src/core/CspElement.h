@@ -49,6 +49,8 @@ namespace OptixCSP {
         void set_origin(const Vec3d& o) override;
         void set_aim_point(const Vec3d& a) override;
         const Vec3d& get_aim_point() const override;
+
+        // set zrot (in degrees)
         void set_zrot(double zrot);
         double get_zrot() const;
         std::shared_ptr<Aperture> get_aperture() const;
