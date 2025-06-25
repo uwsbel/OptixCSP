@@ -1,17 +1,24 @@
 
 # OptixCSP
-**OptixCSP** is a library that utilizes NVIDIA OptiX for ray tracing encountered in Concentrated Solar Power applications.
+
+**OptixCSP** is a modern GPU-accelerated ray tracing middle-ware library for modeling and simulating optical systems encountered in enginnering applications, such as **Concentrated Solar Power (CSP)**.  It is built on top of the [NVIDIA OptiX](https://developer.nvidia.com/optix) GPU ray tracing framework and is designed to be integrated into CSP simulation workflows, such as [SolTrace](https://github.com/NREL/SolTrace), to significantly accelerate ray tracing tasks.
+
+OptixCSP focuses on **accuracy, performance, and extensibility** for users and developers to:
+
+* Rapidly simulate optical behavior in CSP systems: heliostats, receivers, sun modeling, optical properties, etc.
+* Leverage GPU acceleration for complex scenes, large-scale simulations and dynamic updates such as an annual simulation.
+* Integrate OptixCSP into existing CSP software as a high-performance backend.
+* Build standalone ray tracing applications using OptixCSP core.
 
 ---
 
 ## Prerequisites
 
-Before building `optixSoltraceDemos`, ensure you have the following:
+Before building `OptixCSP`, ensure you have the following:
 
 1. **NVIDIA GPU and Drivers**
-   - An NVIDIA GPU.
-   - Minimum CUDA Toolkit version: 11.0.
-   - NVIDIA drivers compatible with your GPU and CUDA version.
+   - An NVIDIA GPU and a compatible NVIDIA driver.
+   - Minimum CUDA Toolkit version: 12.0.
 
 2. **NVIDIA OptiX SDK**
    - Download the NVIDIA OptiX SDK from [NVIDIA's website](https://developer.nvidia.com/designworks/optix/download).
@@ -19,12 +26,7 @@ Before building `optixSoltraceDemos`, ensure you have the following:
      ```
      C:/ProgramData/NVIDIA Corporation/OptiX SDK 8.1.0/
      ```
-   - The source code for the OptiX SDK is located in the `SDK` directory, for example, `C:/ProgramData/NVIDIA Corporation/OptiX SDK 8.1.0/SDK`. Create a `build` folder under the `Optix SDK 8.1.0` directory:
-     ```
-     C:/ProgramData/NVIDIA Corporation/OptiX SDK 8.1.0/build
-     ```
-   - Configure and build the SDK in the created `build` directory, in both `Release` and `Debug` modes
-   - To confirm that the `Optix SDK` is built successfully, run the `optixHello` demo in `build/bin`.
+   - The source code for the OptiX SDK is located in the `SDK` directory, for example, `C:/ProgramData/NVIDIA Corporation/OptiX SDK 8.1.0/SDK`. 
 
 3. **CMake**
    - Version 3.18 or higher.
@@ -34,14 +36,14 @@ Before building `optixSoltraceDemos`, ensure you have the following:
 
 ---
 
-## Building `optixSoltraceDemos`
+## Building `OptixCSP`
 
 ### Configure the Build
 
 1. **Clone the Repository**:
    ```bash
-   git clone git@github.com:uwsbel/optixSoltraceDemos.git
-   cd optixSoltraceDemos
+   git clone git@github.com:uwsbel/optixCSP.git
+   cd optixCSP
    ```
 
 2. **Set the `OptiX_INSTALL_DIR`**:
@@ -64,10 +66,37 @@ Before building `optixSoltraceDemos`, ensure you have the following:
 
 4. **Generate Build Files**:  Run CMake to generate build files for your project
 
-5. **Build the Project**:  Build the optixSoltraceDemos project
+5. **Build the Project**:  Build the optixCSP project
    
 ---
 
 ## Running the Demos
 
-Once built, the executable demos can be found in the `bin` directory. Run them from the command line or within your IDE.
+Once built, demos can be found in the `bin` directory. Run them from the command line or within your IDE.
+
+---
+
+## Using `OptixCSP` as a library
+
+You can link `OptixCSP` to a third-party software such as `SolTrace` see [here](https://github.com/NREL/SolTrace.git).
+
+1. Follow the insturctions [here](#building-optixcsp) to build `OptixCSP`, note that the build process automatically outputs `OptixCSPConfig.cmake` in its build folder (e.g. `build/cmake/`)
+
+2. Configurd CMake for dependencies and to find `OptixCSP`:
+    - Find CudaToolkit and Optix
+      ```cmake
+      find_package(CUDAToolkit)
+      find_package(OptiX)
+    - Specify the location of `OptixCSPConfig.cmake`:
+      ```cmake
+      set(OptixCSP_DIR "/path/to/OptixCSP/build/cmake")
+      find_package(OptixCSP REQUIRED)
+      ```
+
+2. Then link to `OptixCSP_core`:
+    ```cmake
+    target_link_libraries(MyApp
+          PUBLIC  OptixCSP::OptixCSP_core
+                  CUDA::cuda_driver)
+    ```
+---
