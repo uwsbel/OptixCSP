@@ -1,7 +1,7 @@
 
 # OptixCSP
 
-**OptixCSP** is a modern GPU-accelerated ray tracing middle-ware library for modeling and simulating optical systems encountered in enginnering applications, such as **Concentrated Solar Power (CSP)**.  It is built on top of the [NVIDIA OptiX](https://developer.nvidia.com/optix) GPU ray tracing framework and is designed to be integrated into CSP simulation workflows, such as [SolTrace](https://github.com/NREL/SolTrace), to significantly accelerate ray tracing tasks.
+**OptixCSP** is a modern GPU-accelerated ray tracing middle-ware library for modeling and simulating optical systems encountered in enginnering applications, such as **Concentrated Solar Power (CSP)**.  It leverages [NVIDIA OptiX](https://developer.nvidia.com/optix), a GPU-based ray tracing framework and can be used as a stand-alone library or integrated to CSP simulation workflows, such as [SolTrace](https://github.com/NREL/SolTrace), to significantly accelerate ray tracing tasks.
 
 OptixCSP focuses on **accuracy, performance, and extensibility** for users and developers to:
 
