@@ -34,9 +34,9 @@ Before building `OptixCSP`, ensure you have the following:
    - A compiler that supports C++17 or later.
 
 5. The library has been built and tested on the following
-     - Windows, MS Visual Studio 2022, CUDA 12.3, OptiX 8.1
-     - Windows, MS Visual Studio 2022, CUDA 12.8, Optix 8.1
      - Windows, MS Visual Studio 2022, CUDA 12.8, Optix 9.0
+     - Windows, MS Visual Studio 2022, CUDA 12.8, Optix 8.1
+     - Windows, MS Visual Studio 2022, CUDA 12.3, OptiX 8.1
 
 ---
 
