@@ -26,13 +26,17 @@ Before building `OptixCSP`, ensure you have the following:
      ```
      C:/ProgramData/NVIDIA Corporation/OptiX SDK 8.1.0/
      ```
-   - The source code for the OptiX SDK is located in the `SDK` directory, for example, `C:/ProgramData/NVIDIA Corporation/OptiX SDK 8.1.0/SDK`. 
 
 3. **CMake**
    - Version 3.18 or higher.
 
 4. **C++ Compiler**
    - A compiler that supports C++17 or later.
+
+5. The library has been built and tested on the following
+     - Windows, MS Visual Studio 2022, CUDA 12.8, Optix 9.0
+     - Windows, MS Visual Studio 2022, CUDA 12.8, Optix 8.1
+     - Windows, MS Visual Studio 2022, CUDA 12.3, OptiX 8.1
 
 ---
 
@@ -46,27 +50,16 @@ Before building `OptixCSP`, ensure you have the following:
    cd optixCSP
    ```
 
-2. **Set the `OptiX_INSTALL_DIR`**:
-   - Provide the path to the OptiX SDK during CMake configuration.
+2. **Set the `OptiX_INCLUDE`**:
+   - Provide the path to the OptiX SDK include directory during CMake configuration.
    - For example, if the SDK is installed in `C:/ProgramData/NVIDIA Corporation/OptiX SDK 8.1.0/`:
      ```bash
-     cmake -DOptiX_INSTALL_DIR="C:/ProgramData/NVIDIA Corporation/OptiX SDK 8.1.0/" .
+     cmake -DOptiX_INCLUDE="C:/ProgramData/NVIDIA Corporation/OptiX SDK 8.1.0/include" .
      ```
 
-3. **(Optional) Set the `OptiX_INSTALL_DIR` as an Environment Variable**:
-   - Alternatively, you can set `OptiX_INSTALL_DIR` as an environment variable:
-     - On **Windows**:
-       ```powershell
-       $env:OptiX_INSTALL_DIR="C:/ProgramData/NVIDIA Corporation/OptiX SDK 8.1.0/"
-       ```
-     - On **Linux/macOS**:
-       ```bash
-       export OptiX_INSTALL_DIR="/path/to/OptiX SDK/"
-       ```
+3. **Generate Build Files**:  Run CMake to generate build files for your project
 
-4. **Generate Build Files**:  Run CMake to generate build files for your project
-
-5. **Build the Project**:  Build the optixCSP project
+4. **Build the Project**:  Build the optixCSP project
    
 ---
 
