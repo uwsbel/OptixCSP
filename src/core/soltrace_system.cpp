@@ -186,16 +186,12 @@ bool SolTraceSystem::read_st_input(const char* filename) {
     FILE* fp = fopen(filename, "r");
 	if (!fp)
 	{
-        if (m_verbose)
-    		printf("failed to open system input file\n");
-		return false;
+    	printf("failed to open system input file\n");
 	}
 
 	if ( !read_system( fp ) )
 	{
-		if (m_verbose)
-			printf("error in system input file.\n");
-		fclose(fp);
+		printf("error in system input file.\n");
 		return false;
 	}
 	

@@ -28,10 +28,10 @@ int main(int argc, char* argv[]) {
 
 	const char* stinput_file; // Default stinput file name
     if (parabolic) {
-		stinput_file = "../data/stinput/large-system-parabolic-heliostats-cylindrical.stinput"; // Default stinput file name
+		stinput_file = "../data/large-system-parabolic-heliostats-cylindrical.stinput"; // Default stinput file name
     }
     else {
-		stinput_file = "../data/stinput/large-system-flat-heliostats-cylindrical.stinput"; // Default stinput file name
+		stinput_file = "../data/large-system-flat-heliostats-cylindrical.stinput"; // Default stinput file name
     }
 
     system.read_st_input(stinput_file);

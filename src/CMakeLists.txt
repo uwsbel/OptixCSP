@@ -9,8 +9,16 @@ add_library(OptixCSP_core STATIC)
 
 find_package(CUDAToolkit REQUIRED)
 find_package(OptiX REQUIRED)
-
 message(STATUS "OptiX include directory: ${OptiX_INCLUDE}")
+
+# detect compute capabilities
+execute_process(
+    COMMAND nvidia-smi --query-gpu=compute_cap --format=csv,noheader
+    OUTPUT_VARIABLE DETECTED_COMPUTE_CAP
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+string(REPLACE "." "" DETECTED_COMPUTE_CAP ${DETECTED_COMPUTE_CAP})
+message(STATUS "Detected gpu compute capability: ${DETECTED_COMPUTE_CAP}")
 
 
 file(GLOB_RECURSE CORE_SRC  CONFIGURE_DEPENDS  core/*.cpp core/*.cu)
@@ -21,12 +29,11 @@ target_sources(OptixCSP_core PRIVATE ${CORE_SRC} ${CORE_HDR})
 target_include_directories(OptixCSP_core
     PUBLIC  ${CMAKE_CURRENT_SOURCE_DIR}
             ${OptiX_INCLUDE}
-    PRIVATE ${CMAKE_CURRENT_BINARY_DIR}
-            ${OptiX_INCLUDE})
+    PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 
 target_link_libraries(OptixCSP_core
     PRIVATE CUDA::cuda_driver
-            CUDA::cudart_static)
+            CUDA::cudart)
 
 # have to specify the Optix_INCLUDE directory for the CUDA compiler 
 target_compile_options(OptixCSP_core PRIVATE
@@ -35,12 +42,6 @@ target_compile_options(OptixCSP_core PRIVATE
 # ---------------------------------------------------------------------------
 # shaders target
 # ---------------------------------------------------------------------------
-
-#  --gencode flag for all CMAKE_CUDA_ARCHITECTURES
-set(CUDA_GENCODE_FLAGS "")
-foreach(arch ${CMAKE_CUDA_ARCHITECTURES})
-    list(APPEND CUDA_GENCODE_FLAGS "-gencode=arch=compute_${arch},code=sm_${arch}")
-endforeach()
 
 set(SHADERS
     intersection
@@ -63,7 +64,7 @@ foreach(shader ${SHADERS})
             --use_fast_math
             -lineinfo
             -std=c++17
-            -arch=sm_89
+            -arch=sm_${DETECTED_COMPUTE_CAP}
             -I${OptiX_INCLUDE}      
             -DOPTIX_INCLUDE_INTERNAL_FUNCTIONS
             -ptx

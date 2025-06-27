@@ -1,8 +1,8 @@
 #include "core/soltrace_system.h"
-#include "core/CspElement.h"
 #include <iostream>
 #include <stdexcept>
 #include <cstdlib>
+#include <filesystem>
 
 using namespace OptixCSP;
 
@@ -79,10 +79,17 @@ int main(int argc, char* argv[]) {
 	system.initialize();
 
 	int end_frames = 40;
+
+	std::string out_dir = "out_dynamic_scene/";
+	if (!std::filesystem::create_directory(std::filesystem::path(out_dir))) {
+		std::cerr << "Error creating directory " << out_dir << std::endl;
+		return 1;
+	}
+
 	for (int frame = 0; frame < end_frames; frame++) {
 		system.run();
-		std::string filename = "output_dynamic_" + std::to_string(frame) + ".csv";
-		system.write_output(filename);
+		std::string filename = "hit_points_frame_" + std::to_string(frame) + ".csv";
+		system.write_output(out_dir+filename);
 
 		// update strategy, can either be sun vector or pose/position of the heliostats
 		//aim_point_e3[2] += 1;
