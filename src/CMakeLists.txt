@@ -64,7 +64,8 @@ foreach(shader ${SHADERS})
             --use_fast_math
             -lineinfo
             -std=c++17
-            -arch=sm_${DETECTED_COMPUTE_CAP}
+#            -arch=sm_${DETECTED_COMPUTE_CAP}
+            -arch=sm_80
             -I${OptiX_INCLUDE}      
             -DOPTIX_INCLUDE_INTERNAL_FUNCTIONS
             -ptx

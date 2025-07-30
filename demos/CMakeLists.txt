@@ -5,6 +5,8 @@
 set(DEMOS
      demo_large_scene
      demo_dynamic_scene
+     demo_three_heliostats
+     demo_sun_modeling
 )
 
 message(STATUS "Adding demo programs for OptiX SolTrace ...")

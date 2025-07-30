@@ -1,38 +1,20 @@
-#include "soltrace_system.h"
-#include "lib/element.h"
+#include "core/soltrace_system.h"
 #include <iostream>
 #include <stdexcept>
 #include <cstdlib>
-#include <optix_function_table_definition.h>
-#include <timer.h>
+#include <filesystem>
 
+
+using namespace std;
+using namespace OptixCSP;
 
 int main(int argc, char* argv[]) {
-    bool stinput = false; // Set to true if using stinput file, false otherwise
     bool parabolic = true; // Set to true for parabolic mirrors, false for flat mirrors
     bool use_cylindical = false;
     // number of rays launched for the simulation
-    int num_rays = 10000;
+    int num_rays = 100000;
     // Create the simulation system.
     SolTraceSystem system(num_rays);
-
-    if (stinput) {
-        const char* stinput_file = "../data/stinput/large-system-flat-heliostats-cylindrical.stinput"; // Default stinput file name
-
-        if (argc > 1) {
-            stinput_file = argv[1]; // Get the stinput file name from command line argument
-        }
-
-        if (stinput) {
-            // Read the system from the file
-            std::cout << "Reading STINPUT file." << std::endl;
-            system.read_st_input(stinput_file);
-        }
-        else {
-            std::cout << "Error: System setup failed." << std::endl;
-        }
-    }
-    else {
 
         //////////////////////////////////////////////////////////////////
         // STEP 0: initialize the ray trace system with number of rays //
@@ -42,9 +24,9 @@ int main(int argc, char* argv[]) {
         // STEP 1.1 Create heliostats, parabolic rectangle mirror  //
         ////////////////////////////////////////////////////////////
         // Element 1
-        Vector3d origin_e1(-5, 0, 0); // origin of the element
-        Vector3d aim_point_e1(17.360680, 0, 94.721360); // aim point of the element
-        auto e1 = std::make_shared<Element>();
+        Vec3d origin_e1(-5, 0, 0); // origin of the element
+        Vec3d aim_point_e1(17.360680, 0, 94.721360); // aim point of the element
+        auto e1 = std::make_shared<CspElement>();
         e1->set_origin(origin_e1);
         e1->set_aim_point(aim_point_e1); // Aim direction
         e1->set_zrot(-90.0); // Set the rotation around the Z-axis
@@ -80,9 +62,9 @@ int main(int argc, char* argv[]) {
         //system.add_element(e1);
 
         // Element 2
-        Vector3d origin_e2(0, 5, 0); // origin of the element
-        Vector3d aim_point_e2(0, -17.360680, 94.721360); // aim point of the element
-        auto e2 = std::make_shared<Element>();
+        Vec3d origin_e2(0, 5, 0); // origin of the element
+        Vec3d aim_point_e2(0, -17.360680, 94.721360); // aim point of the element
+        auto e2 = std::make_shared<CspElement>();
         e2->set_origin(origin_e2);
         e2->set_aim_point(aim_point_e2); // Aim direction
         e2->set_zrot(0.0); // No rotation for the element
@@ -104,9 +86,9 @@ int main(int argc, char* argv[]) {
         system.add_element(e2);
 
         // Element 3
-        Vector3d origin_e3(5, 0, 0); // origin of the element
-        Vector3d aim_point_e3(-17.360680, 0, 94.721360); // aim point of the element
-        auto e3 = std::make_shared<Element>();
+        Vec3d origin_e3(5, 0, 0); // origin of the element
+        Vec3d aim_point_e3(-17.360680, 0, 94.721360); // aim point of the element
+        auto e3 = std::make_shared<CspElement>();
         e3->set_origin(origin_e3);
         e3->set_aim_point(aim_point_e3); // Aim direction
         e3->set_zrot(-90.0);
@@ -130,13 +112,13 @@ int main(int argc, char* argv[]) {
         //////////////////////////////////////////////
         // STEP 2.1 Create receiver, flat rectangle //
         //////////////////////////////////////////////
-        Vector3d receiver_origin(0, 0, 10.0); // origin of the receiver
-        Vector3d receiver_aim_point(0, 5, 0); // aim point of the receiver
+        Vec3d receiver_origin(0, 0, 10.0); // origin of the receiver
+        Vec3d receiver_aim_point(0, 5, 0); // aim point of the receiver
         if (use_cylindical) {
             receiver_aim_point[2] = receiver_origin[2];
         }
 
-        auto e4 = std::make_shared<Element>();
+        auto e4 = std::make_shared<CspElement>();
         e4->set_origin(receiver_origin);
         e4->set_aim_point(receiver_aim_point); // Aim direction
         e4->set_zrot(0.0); // No rotation for the receiver
@@ -179,17 +161,13 @@ int main(int argc, char* argv[]) {
         ///////////////////////////////////////////
         system.add_element(e4); // Add the receiver to the system
 
-        // set up sun vector and angle 
-        Vector3d sun_vector(0.0, 0.0, 100.0); // sun vector
-        double sun_angle = 0.0; // sun angle
-
-        system.set_sun_vector(sun_vector);
-        system.set_sun_angle(sun_angle);
-    }
+    
+    Vec3d sun_vector(0.0, 0.0, 100.0); // sun vector
 
     // set up sun angle 
     double sun_angle = 0.00465; // 0.00465; // sun angle
     system.set_sun_angle(sun_angle);
+	system.set_sun_vector(sun_vector);
 
     ///////////////////////////////////
     // STEP 3  Initialize the system //
@@ -205,7 +183,13 @@ int main(int argc, char* argv[]) {
     //////////////////////////
     // STEP 5  Post process //
     //////////////////////////
-    system.write_output("output_large_system_flat_heliostats_cylindrical_receiver_stinput-sun_shape_on.csv");
+	std::string out_dir = "out_three_heliostats/";
+    if (!std::filesystem::create_directory(std::filesystem::path(out_dir))) {
+        std::cerr << "Error creating directory " << out_dir << std::endl;
+        return 1;
+    }
+
+    system.write_output(out_dir + "hit_points.csv");
 
     /////////////////////////////////////////
     // STEP 6  Be a good citizen, clean up //
