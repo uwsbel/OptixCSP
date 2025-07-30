@@ -18,6 +18,7 @@ dataManager::dataManager() : launch_params_D(nullptr) {
 	launch_params_H.max_depth = 5;
 
 	launch_params_H.hit_point_buffer = nullptr;
+	launch_params_H.sun_dir_buffer = nullptr;
 	launch_params_H.sun_vector = make_float3(0.0f, 0.0f, 10.0f);
 	launch_params_H.max_sun_angle = 0.0f;
 

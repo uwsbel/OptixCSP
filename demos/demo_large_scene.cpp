@@ -52,7 +52,7 @@ int main(int argc, char* argv[]) {
 
 
 	std::cout << "num_rays, " << num_rays << ", timing_setup, " << system.get_time_setup() << ", timing_trace, " << system.get_time_trace() << std::endl;
-    system.write_output("output_large_system_flat_heliostats_cylindrical_receiver_stinput-sun_shape_on.csv");
+    system.write_hp_output("output_large_system_flat_heliostats_cylindrical_receiver_stinput-sun_shape_on.csv");
 
     system.clean_up();
 

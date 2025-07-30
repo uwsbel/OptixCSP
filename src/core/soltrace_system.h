@@ -41,7 +41,8 @@ namespace OptixCSP {
         bool read_st_input(const char* filename);
 
         // Write the output to a file.
-        void write_output(const std::string& filename);
+        void write_sun_output(const std::string& filename);
+        void write_hp_output(const std::string& filename);
 
         /// Explicit cleanup
         void clean_up();

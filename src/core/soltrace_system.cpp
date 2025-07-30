@@ -31,18 +31,19 @@ void SolTraceSystem::print_launch_params() {
     float sun_box_edge_b = sqrtf(sun_box_b.x * sun_box_b.x + sun_box_b.y * sun_box_b.y + sun_box_b.z * sun_box_b.z);
 
     std::cout << "print launch params: " << std::endl;
-    std::cout << "width: " << params.width << std::endl;
-    std::cout << "height: " << params.height << std::endl;
-    std::cout << "max_depth: " << params.max_depth << std::endl;
-    std::cout << "hit_point_buffer: " << params.hit_point_buffer << std::endl;
-    std::cout << "sun_vector: " <<params.sun_vector.x << " " <<params.sun_vector.y << " " <<params.sun_vector.z << std::endl;
-    std::cout << "max_sun_angle: " <<params.max_sun_angle << std::endl;
-    std::cout << "sun_v0: " <<params.sun_v0.x << " " <<params.sun_v0.y << " " <<params.sun_v0.z << std::endl;
-    std::cout << "sun_v1: " <<params.sun_v1.x << " " <<params.sun_v1.y << " " <<params.sun_v1.z << std::endl;
-    std::cout << "sun_v2: " <<params.sun_v2.x << " " <<params.sun_v2.y << " " <<params.sun_v2.z << std::endl;
-    std::cout << "sun_v3: " <<params.sun_v3.x << " " <<params.sun_v3.y << " " <<params.sun_v3.z << std::endl;
-    std::cout << "sun_box_edge_a: " << sun_box_edge_a << std::endl;
-    std::cout << "sun_box_edge_b: " << sun_box_edge_b << std::endl;
+    std::cout << "width              : " << params.width << std::endl;
+    std::cout << "height             : " << params.height << std::endl;
+    std::cout << "max_depth          : " << params.max_depth << std::endl;
+    std::cout << "hit_point_buffer   : " << params.hit_point_buffer << std::endl;
+	std::cout << "sun_dir_buffer     : " << params.sun_dir_buffer << std::endl;
+    std::cout << "sun_vector         : " << params.sun_vector.x << " " <<params.sun_vector.y << " " <<params.sun_vector.z << std::endl;
+    std::cout << "max_sun_angle      : " << params.max_sun_angle << std::endl;
+    std::cout << "sun_v0             : " << params.sun_v0.x << " " <<params.sun_v0.y << " " <<params.sun_v0.z << std::endl;
+    std::cout << "sun_v1             : " << params.sun_v1.x << " " <<params.sun_v1.y << " " <<params.sun_v1.z << std::endl;
+    std::cout << "sun_v2             : " << params.sun_v2.x << " " <<params.sun_v2.y << " " <<params.sun_v2.z << std::endl;
+    std::cout << "sun_v3             : " << params.sun_v3.x << " " <<params.sun_v3.y << " " <<params.sun_v3.z << std::endl;
+    std::cout << "sun_box_edge_a     : " << sun_box_edge_a << std::endl;
+    std::cout << "sun_box_edge_b     : " << sun_box_edge_b << std::endl;
 }
 
 SolTraceSystem::SolTraceSystem(int numSunPoints)
@@ -123,6 +124,13 @@ void SolTraceSystem::initialize() {
     ));
     CUDA_CHECK(cudaMemset(data_manager->launch_params_H.hit_point_buffer, 0, hit_point_buffer_size));
 
+
+	// Luning TODO: Allocate memory for the direction cosine buffer, size is number of rays launched * depth
+    const size_t sun_dir_size = data_manager->launch_params_H.width * data_manager->launch_params_H.height * sizeof(float3);
+
+    CUDA_CHECK(cudaMalloc(reinterpret_cast<void**>(&data_manager->launch_params_H.sun_dir_buffer), sun_dir_size));
+    CUDA_CHECK(cudaMemset(data_manager->launch_params_H.sun_dir_buffer, 0, sun_dir_size));
+
     // Create a CUDA stream for asynchronous operations.
     CUDA_CHECK(cudaStreamCreate(&m_state.stream));
 
@@ -200,7 +208,7 @@ bool SolTraceSystem::read_st_input(const char* filename) {
     return true;
 }
 
-void SolTraceSystem::write_output(const std::string& filename) {
+void SolTraceSystem::write_hp_output(const std::string& filename) {
     int output_size = data_manager->launch_params_H.width * data_manager->launch_params_H.height * data_manager->launch_params_H.max_depth;
     std::vector<float4> hp_output_buffer(output_size);
     CUDA_CHECK(cudaMemcpy(hp_output_buffer.data(), data_manager->launch_params_H.hit_point_buffer, output_size * sizeof(float4), cudaMemcpyDeviceToHost));
@@ -213,7 +221,8 @@ void SolTraceSystem::write_output(const std::string& filename) {
     }
 
     // Write header
-    outFile << "number,stage,loc_x,loc_y,loc_z\n";
+	// TODO, if statements to check if one needs to write dir_cos_buffer or not
+    outFile << "number,stage,loc_x,loc_y,loc_z,cosx,cosy,cosz\n";
 
     int currentRay = 1;
     int stage = 0;
@@ -251,13 +260,41 @@ void SolTraceSystem::write_output(const std::string& filename) {
 
     outFile.close();
     std::cout << "Data successfully written to " << filename << std::endl;
-
-
-
-
-
 }
 
+
+void SolTraceSystem::write_sun_output(const std::string& filename) {
+    int output_size = data_manager->launch_params_H.width * data_manager->launch_params_H.height;
+
+    std::vector<float3> sun_dir_buffer(output_size);
+    CUDA_CHECK(cudaMemcpy(sun_dir_buffer.data(), data_manager->launch_params_H.sun_dir_buffer, output_size * sizeof(float3), cudaMemcpyDeviceToHost));
+
+
+    std::ofstream outFile(filename);
+
+    if (!outFile.is_open()) {
+        std::cerr << "Error: Could not open the file " << filename << " for writing." << std::endl;
+        return;
+    }
+
+    // Write header
+    // TODO, if statements to check if one needs to write dir_cos_buffer or not
+    outFile << "number,cosx,cosy,cosz\n";
+
+    int currentRay = 1;
+
+    for (const auto& element : sun_dir_buffer) {
+        outFile << currentRay << ","
+                << element.x << "," 
+                << element.y << ","
+                << element.z << "\n";
+
+        currentRay++;
+    }
+
+    outFile.close();
+    std::cout << "Data successfully written to " << filename << std::endl;
+}
 
 void SolTraceSystem::clean_up() {
 
@@ -284,6 +321,8 @@ void SolTraceSystem::clean_up() {
 
     // Free device-side launch parameter memory
     CUDA_CHECK(cudaFree(reinterpret_cast<void*>(data_manager->launch_params_H.hit_point_buffer)));
+    CUDA_CHECK(cudaFree(reinterpret_cast<void*>(data_manager->launch_params_H.sun_dir_buffer)));
+
     CUDA_CHECK(cudaFree(reinterpret_cast<void*>(data_manager->launch_params_D)));
 
     data_manager->cleanup();

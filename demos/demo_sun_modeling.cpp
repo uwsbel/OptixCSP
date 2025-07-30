@@ -9,7 +9,7 @@ using namespace std;
 using namespace OptixCSP;
 
 int main(int argc, char* argv[]) {
-    int num_rays = 100000;
+    int num_rays = 10000;
     // Create the simulation system.
     SolTraceSystem system(num_rays);
 
@@ -94,7 +94,8 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    system.write_output(out_dir + "hit_points.csv");
+    system.write_hp_output(out_dir + "hit_points.csv");
+	system.write_sun_output(out_dir + "sun_direction.csv");
 
     /////////////////////////////////////////
     // STEP 6  Be a good citizen, clean up //

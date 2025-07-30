@@ -89,7 +89,7 @@ int main(int argc, char* argv[]) {
 	for (int frame = 0; frame < end_frames; frame++) {
 		system.run();
 		std::string filename = "hit_points_frame_" + std::to_string(frame) + ".csv";
-		system.write_output(out_dir+filename);
+		system.write_hp_output(out_dir+filename);
 
 		// update strategy, can either be sun vector or pose/position of the heliostats
 		//aim_point_e3[2] += 1;

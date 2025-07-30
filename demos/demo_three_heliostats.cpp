@@ -189,7 +189,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    system.write_output(out_dir + "hit_points.csv");
+    system.write_hp_output(out_dir + "hit_points.csv");
 
     /////////////////////////////////////////
     // STEP 6  Be a good citizen, clean up //
