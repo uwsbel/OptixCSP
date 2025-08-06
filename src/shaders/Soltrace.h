@@ -43,7 +43,7 @@ namespace OptixCSP{
 
         float3                      sun_vector;
         float                       max_sun_angle;
-
+		unsigned long long          sun_dir_seed; // seed for the sun direction randomization
 
         float3                      sun_v0;
         float3                      sun_v1;

@@ -9,7 +9,7 @@ using namespace std;
 using namespace OptixCSP;
 
 int main(int argc, char* argv[]) {
-    int num_rays = 10000;
+    int num_rays = 1000000;
     // Create the simulation system.
     SolTraceSystem system(num_rays);
 

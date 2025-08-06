@@ -44,7 +44,7 @@ namespace OptixCSP {
     // Sample a random ray direction within a cone defined by a maximum angle
     __device__ float3 sampleRayDirectionInCone_Pillbox(float3 dir, float half_angle, unsigned int ray_number) {
         curandState rng_state;
-        curand_init(ray_number, 0, 0, &rng_state);
+        curand_init(params.sun_dir_seed, ray_number, 0, &rng_state);
 
         // Build an orthonormal basis
         float3 w = normalize(dir);
@@ -63,9 +63,9 @@ namespace OptixCSP {
         return normalize(r * (cosf(phi) * u + sinf(phi) * v) + z * w);
     }
 
-    __device__ float3 sampleRayDirectionInCone_Gaussian(float3 dir, float half_angle, unsigned int seed) {
+    __device__ float3 sampleRayDirectionInCone_Gaussian(float3 dir, float half_angle, unsigned int ray_number) {
         curandState rng;
-        curand_init(seed, 0, 0, &rng);
+        curand_init(params.sun_dir_seed, ray_number, 0, &rng);
 
         // Build an orthonormal basis
         float3 w = normalize(dir);
@@ -103,6 +103,7 @@ extern "C" __global__ void __raygen__sun_source()
 
     float3 init_ray_dir = -normalize(params.sun_vector);
     float3 ray_dir = OptixCSP::sampleRayDirectionInCone_Pillbox(init_ray_dir, params.max_sun_angle, ray_number);
+    //float3 ray_dir = OptixCSP::sampleRayDirectionInCone_Gaussian(init_ray_dir, params.max_sun_angle, ray_number);
 
     // Create the PerRayData structure to track ray state (e.g., path index and recursion depth)
     OptixCSP::PerRayData prd;

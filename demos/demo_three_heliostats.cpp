@@ -11,8 +11,13 @@ using namespace OptixCSP;
 int main(int argc, char* argv[]) {
     bool parabolic = true; // Set to true for parabolic mirrors, false for flat mirrors
     bool use_cylindical = false;
+
+    if (argc != 2) {
+		std::cout << "Usage: " << argv[0] << " <num_of_rays>" << std::endl;
+    }
+
     // number of rays launched for the simulation
-    int num_rays = 100000;
+	int num_rays = stoi(argv[1]);
     // Create the simulation system.
     SolTraceSystem system(num_rays);
 
@@ -59,7 +64,7 @@ int main(int argc, char* argv[]) {
         ////////////////////////////////////////////
         // STEP 1.4 Add the element to the system //
         ///////////////////////////////////////////
-        //system.add_element(e1);
+        system.add_element(e1);
 
         // Element 2
         Vec3d origin_e2(0, 5, 0); // origin of the element
@@ -91,7 +96,7 @@ int main(int argc, char* argv[]) {
         auto e3 = std::make_shared<CspElement>();
         e3->set_origin(origin_e3);
         e3->set_aim_point(aim_point_e3); // Aim direction
-        e3->set_zrot(-90.0);
+        e3->set_zrot(90.0);
 
         if (parabolic) {
             auto surface_e3 = std::make_shared<SurfaceParabolic>();
@@ -184,12 +189,16 @@ int main(int argc, char* argv[]) {
     // STEP 5  Post process //
     //////////////////////////
 	std::string out_dir = "out_three_heliostats/";
-    if (!std::filesystem::create_directory(std::filesystem::path(out_dir))) {
-        std::cerr << "Error creating directory " << out_dir << std::endl;
-        return 1;
-    }
+    if (!std::filesystem::exists(std::filesystem::path(out_dir))) {
+        std::cout << "Creating output directory: " << out_dir << std::endl;
+        if (!std::filesystem::create_directory(std::filesystem::path(out_dir))) {
+            std::cerr << "Error creating directory " << out_dir << std::endl;
+            return 1;
+        }
 
-    system.write_hp_output(out_dir + "hit_points.csv");
+	}
+
+    system.write_hp_output(out_dir + "hit_points_" + argv[1] + "_rays.csv");
 
     /////////////////////////////////////////
     // STEP 6  Be a good citizen, clean up //

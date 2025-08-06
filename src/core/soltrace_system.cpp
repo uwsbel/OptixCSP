@@ -115,6 +115,10 @@ void SolTraceSystem::initialize() {
     data_manager->launch_params_H.height = 1;
     data_manager->launch_params_H.max_depth = MAX_TRACE_DEPTH;
 
+
+	// seed for sun ray randomization
+    data_manager->launch_params_H.sun_dir_seed = 123456ULL;
+
     // Allocate memory for the hit point buffer, size is number of rays launched * depth
     const size_t hit_point_buffer_size = data_manager->launch_params_H.width * data_manager->launch_params_H.height * sizeof(float4) * data_manager->launch_params_H.max_depth;
 
