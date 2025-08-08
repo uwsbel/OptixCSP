@@ -67,7 +67,7 @@ int main(int argc, char* argv[]) {
     
     Vec3d sun_vector(0.0, 0.0, 100.0); // sun vector
     // set up sun angle 
-    double sun_angle = 0.00465; // 0.00465; // sun angle
+    double sun_angle = 0.465; // 0.00465; // sun angle
     system.set_sun_angle(sun_angle);
 	system.set_sun_vector(sun_vector);
 
@@ -95,7 +95,7 @@ int main(int argc, char* argv[]) {
     }
 
     system.write_hp_output(out_dir + "hit_points.csv");
-	system.write_sun_output(out_dir + "sun_direction.csv");
+	system.write_sun_output(out_dir + "sun_direction_gaussian_old.csv");
 
     /////////////////////////////////////////
     // STEP 6  Be a good citizen, clean up //

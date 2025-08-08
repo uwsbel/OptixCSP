@@ -266,6 +266,91 @@ void SolTraceSystem::write_hp_output(const std::string& filename) {
     std::cout << "Data successfully written to " << filename << std::endl;
 }
 
+// write json output file for post processing
+// need sun vector, number of rays, sun box, sun angle
+// receiver stats, dimension, type, location, rotation matrix. 
+// writing timing?
+
+void SolTraceSystem::write_simulation_json(const std::string& filename) {
+	std::ofstream out(filename);
+    
+    // process sun stats
+    float3 sun_box_a = data_manager->launch_params_H.sun_v0 - data_manager->launch_params_H.sun_v1;
+    float3 sun_box_b = data_manager->launch_params_H.sun_v1 - data_manager->launch_params_H.sun_v2;
+
+	float sun_box_edge_a = length(sun_box_a);
+	float sun_box_edge_b = length(sun_box_b);
+
+    out << "{\n";
+    out << "  \"sun\": {\n";
+    out << "    \"number_of_sunpoints\": " << m_num_sunpoints << ",\n";
+    out << "    \"sun_vector\": ["
+        << m_sun_vector[0] << ", " << m_sun_vector[1] << ", " << m_sun_vector[2] << "],\n";
+    out << "    \"sun_box_edge_a\": " << sun_box_edge_a << ",\n";
+    out << "    \"sun_box_edge_b\": " << sun_box_edge_b << "\n";
+    out << "  },\n";
+
+
+    std::shared_ptr<CspElement> receiver = m_element_list.back();
+
+    out << "  \"receiver\": {\n";
+
+	// use enum to get the type of the receiver
+	std::string receiver_type = "unknown";
+
+    switch (receiver->get_surface_type()) {
+        case SurfaceType::FLAT:
+            receiver_type = "flat";
+            out << "    \"type\": \"" << receiver_type << "\",\n";
+			out << "    \"dimensions\": [" << receiver->get_aperture()->get_width() << ", " << 
+                                              receiver->get_aperture()->get_height() << "],\n";
+
+            break;
+        case SurfaceType::CYLINDER:
+            receiver_type = "cylinder";
+            out << "    \"type\": \"" << receiver_type << "\",\n";
+			out << "    \"radius\": " << receiver->get_aperture()->get_width() / 2.0f << ",\n";
+			out << "    \"height\": " << receiver->get_aperture()->get_height() << ",\n";
+
+            break;
+        case SurfaceType::PARABOLIC:
+            //TODO
+            // can we have parabolic receiver?
+            receiver_type = "parabolic";
+            break;
+        default:
+            receiver_type = "unknown";
+			break;
+    }
+
+	Vec3d receiver_location = receiver->get_origin();
+	Matrix33d rotation_matrix = receiver->get_rotation_matrix(); // get the rotation matrix
+	Vec3d receiver_x_basis = rotation_matrix.get_x_basis();
+	Vec3d receiver_y_basis = rotation_matrix.get_y_basis();
+	Vec3d receiver_z_basis = rotation_matrix.get_z_basis();
+
+    out << "    \"location\": ["
+        << receiver_location[0] << ", " << receiver_location[1] << ", " << receiver_location[2] << "],\n";
+
+    // print out rotation matrix basis
+	out << "    \"rotation_matrix\": {\n";
+    out << "      \"x_basis\": ["
+		<< receiver_x_basis[0] << ", " << receiver_x_basis[1] << ", " << receiver_x_basis[2] << "],\n";
+	out << "      \"y_basis\": ["
+		<< receiver_y_basis[0] << ", " << receiver_y_basis[1] << ", " << receiver_y_basis[2] << "],\n";
+	out << "      \"z_basis\": ["
+		<< receiver_z_basis[0] << ", " << receiver_z_basis[1] << ", " << receiver_z_basis[2] << "]}\n";
+
+
+    out << "  }\n";
+    out << "}\n";
+
+    out.close();
+
+}
+
+
+
 
 void SolTraceSystem::write_sun_output(const std::string& filename) {
     int output_size = data_manager->launch_params_H.width * data_manager->launch_params_H.height;

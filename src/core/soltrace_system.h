@@ -40,9 +40,14 @@ namespace OptixCSP {
         // Read a stinput file for the simulation setup.
         bool read_st_input(const char* filename);
 
-        // Write the output to a file.
+        // Write sun point to a file
         void write_sun_output(const std::string& filename);
+        // write all the hit points to a file
         void write_hp_output(const std::string& filename);
+        // write simulation summary to a file, including receiver stats, etc
+		void write_simulation_json(const std::string& filename);
+
+
 
         /// Explicit cleanup
         void clean_up();

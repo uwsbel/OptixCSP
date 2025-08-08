@@ -1,25 +1,23 @@
 // main.cpp
-#include "SolTrSystem.h"
+#include "core/soltrace_system.h"
 #include <iostream>
-#include <stdexcept>
-#include <cstdlib>
-#include <optix_function_table_definition.h>
-
+#include <filesystem>
 enum TestCase {PARABOLIC, FLAT};
 
+using namespace std;
+using namespace OptixCSP;
 
 int main(int argc, char* argv[]) {
     // Default number of rays launched for the simulation
-    int num_rays = 10000;
+    int num_rays = 100000;
     if (argc >= 2)
         num_rays = std::stoi(argv[1]);
 
     std::cout << "Starting ST_System simulation with " << num_rays << " sun points..." << std::endl;
+	SolTraceSystem system(num_rays);
 
-    // Create the simulation system instance.
-    SolTraceSystem system(num_rays);
 
-	Vector3d sun_vector(0, 0, 1.); // sun vector
+    Vec3d sun_vector(0, 0, 1.); // sun vector
 	system.set_sun_vector(sun_vector); // Set the sun vector
 
     double curv_x = 0.05;
@@ -33,11 +31,11 @@ int main(int argc, char* argv[]) {
 	//Vector3d origin(0, 5, 0); // origin of the element
 	//Vector3d aim_point(0, 4.551982, 1.897836); // aim point of the element
 
-    Vector3d origin(0, 0, 0); // origin of the element
-    Vector3d aim_point(0, 0, 10); // aim point of the element
+    Vec3d origin(0, 0, 0); // origin of the element
+    Vec3d aim_point(0, 0, 10); // aim point of the element
 
 
-    auto e1 = std::make_shared<Element>();
+    auto e1 = std::make_shared<CspElement>();
     e1->set_origin(origin);
     e1->set_aim_point(aim_point); // Aim direction
 
@@ -68,13 +66,13 @@ int main(int argc, char* argv[]) {
     // Add receiver the last for now //
     // TODO: this needs to be changed, sequence should not matter //
     ///////////////////////////////////////////////////////////////
-    Vector3d receiver_origin(0, 0, 8.0); // origin of the receiver
-    Vector3d receiver_aim_point(0, 0, -1); // aim point of the receiver
-    double receiver_dim_x = 10.0;
-    double receiver_dim_y = 10.0;
+    Vec3d receiver_origin(0, 0, 8.0); // origin of the receiver
+    Vec3d receiver_aim_point(0, 0, -1); // aim point of the receiver
+    double receiver_dim_x = 0.4;
+    double receiver_dim_y = 0.4;
 
 
-	auto e2 = std::make_shared<Element>();
+	auto e2 = std::make_shared<CspElement>();
 	e2->set_origin(receiver_origin);
 	e2->set_aim_point(receiver_aim_point); // Aim direction
 	auto receiver_aperture = std::make_shared<ApertureRectangle>(receiver_dim_x, receiver_dim_y);
@@ -104,12 +102,25 @@ int main(int argc, char* argv[]) {
             break;
 
     }
-	system.write_output(filename);
+
+
+    std::string out_dir = "out_parabolic_surface/";
+    if (!std::filesystem::exists(std::filesystem::path(out_dir))) {
+        std::cout << "Creating output directory: " << out_dir << std::endl;
+        if (!std::filesystem::create_directory(std::filesystem::path(out_dir))) {
+            std::cerr << "Error creating directory " << out_dir << std::endl;
+            return 1;
+        }
+
+    }
+
+	system.write_hp_output(out_dir + filename);
+	system.write_simulation_json(out_dir + "summary.json");
 
     // Clean up all allocated resources.
     system.clean_up();
 
     std::cout << "Simulation completed successfully." << std::endl;
-
+    
     return 0;
 }
