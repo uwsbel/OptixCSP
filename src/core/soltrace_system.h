@@ -12,7 +12,7 @@
 #include "core/vec3d.h"      // Vec3d
 #include "core/timer.h"
 #include "core/CspElement.h" // CspElement
-#include "core/surface.h"    // Surface and derived classes
+#include "core/Surface.h"    // Surface and derived classes
 
 namespace OptixCSP {
 

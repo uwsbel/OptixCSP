@@ -3,7 +3,7 @@
 #include <cmath>
 #include <vector_types.h>
 #include <vector_functions.h>
-#include "vec3d.h"
+#include "core/vec3d.h"
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846

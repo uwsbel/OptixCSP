@@ -12,6 +12,8 @@
 #include <fstream>
 #include <iostream>
 #include <iomanip>
+#include <cstring>
+
 #include <optix_function_table_definition.h>
 #include <optix_stubs.h>
 

@@ -1,4 +1,4 @@
-#include "aperture.h"
+#include "Aperture.h"
 
 using namespace OptixCSP;
 
