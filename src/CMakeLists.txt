@@ -27,9 +27,10 @@ file(GLOB_RECURSE CORE_HDR  CONFIGURE_DEPENDS  core/*.hpp core/*.h utils/*.hpp u
 target_sources(OptixCSP_core PRIVATE ${CORE_SRC} ${CORE_HDR})
 
 target_include_directories(OptixCSP_core
-    PUBLIC  ${CMAKE_CURRENT_SOURCE_DIR}
-            ${OptiX_INCLUDE}
-    PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+   PUBLIC  ${CMAKE_CURRENT_SOURCE_DIR}
+           ${OptiX_INCLUDE}
+           ${CUDAToolkit_INCLUDE_DIRS}
+   PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 
 target_link_libraries(OptixCSP_core
     PRIVATE CUDA::cuda_driver

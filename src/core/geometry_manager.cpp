@@ -5,6 +5,8 @@
 #include "utils/util_check.hpp"
 #include "data_manager.h"
 #include <vector>
+#include <optix_stubs.h>
+
 
 using namespace OptixCSP;
 

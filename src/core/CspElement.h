@@ -2,11 +2,12 @@
 
 #include <cstdint>
 #include <string>
+#include <memory>
 
-#include "Vec3d.h"
+#include "vec3d.h"
 #include "soltrace_type.h"
-#include "surface.h"
-#include "aperture.h"
+#include "Surface.h"
+#include "Aperture.h"
 #include "utils/math_util.h"
 #include "shaders/GeometryDataST.h"
 

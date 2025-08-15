@@ -1,6 +1,7 @@
 #include <optix.h>
 #include <curand_kernel.h>
 #include <vector_types.h>
+#include <float.h>
 
 #include "shaders/Soltrace.h"
 

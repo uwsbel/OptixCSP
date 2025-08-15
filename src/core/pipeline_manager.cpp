@@ -12,6 +12,8 @@
 #include "soltrace_state.h"
 #include "pipeline_manager.h"
 #include <fstream>
+#include <optix_stubs.h>
+
 
 using namespace OptixCSP;
 
