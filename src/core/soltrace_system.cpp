@@ -439,10 +439,7 @@ void SolTraceSystem::clean_up() {
     CUDA_CHECK(cudaFree(reinterpret_cast<void*>(data_manager->launch_params_H.hit_point_buffer)));
     CUDA_CHECK(cudaFree(reinterpret_cast<void*>(data_manager->launch_params_H.sun_dir_buffer)));
 
-    CUDA_CHECK(cudaFree(reinterpret_cast<void*>(data_manager->launch_params_D)));
-
     data_manager->cleanup();
-
 
 }
 
