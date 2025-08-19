@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.25)
+cmake_minimum_required(VERSION 3.20)
 
 project(OptixCSP LANGUAGES CXX CUDA)
 
@@ -8,7 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # CUDA architectures 
-set(CMAKE_CUDA_ARCHITECTURES 75;86;89)
+set(CMAKE_CUDA_ARCHITECTURES 75;86;89;90)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/")
 
