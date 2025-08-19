@@ -50,6 +50,7 @@ void SolTraceSystem::print_launch_params() {
 
 SolTraceSystem::SolTraceSystem(int numSunPoints)
     : m_num_sunpoints(numSunPoints),
+      m_num_hits_receiver(0),
       m_verbose(false),
       m_mem_free_before(0),
       m_mem_free_after(0),
@@ -214,6 +215,24 @@ bool SolTraceSystem::read_st_input(const char* filename) {
     return true;
 }
 
+int SolTraceSystem::get_num_hits_receiver() {
+
+    int output_size = m_num_sunpoints * data_manager->launch_params_H.max_depth;
+    std::vector<float4> hp_output_buffer(output_size);
+    CUDA_CHECK(cudaMemcpy(hp_output_buffer.data(), data_manager->launch_params_H.hit_point_buffer, output_size * sizeof(float4), cudaMemcpyDeviceToHost));
+
+    // go through the hit point buffer, and only collect data where the first element is 2.0f 
+	// which indicates a hit on the receiver
+
+	m_num_hits_receiver = 0;
+    for (const auto& element : hp_output_buffer) {
+        if (std::abs(element.x - 2.0) < 0.1f) { // x value of 2.0 indicates a hit on the receiver
+            m_num_hits_receiver++;
+        }
+	}
+    return m_num_hits_receiver;
+}
+
 void SolTraceSystem::write_hp_output(const std::string& filename) {
     int output_size = data_manager->launch_params_H.width * data_manager->launch_params_H.height * data_manager->launch_params_H.max_depth;
     std::vector<float4> hp_output_buffer(output_size);
@@ -267,6 +286,8 @@ void SolTraceSystem::write_hp_output(const std::string& filename) {
     outFile.close();
     std::cout << "Data successfully written to " << filename << std::endl;
 }
+
+
 
 // write json output file for post processing
 // need sun vector, number of rays, sun box, sun angle
@@ -333,6 +354,10 @@ void SolTraceSystem::write_simulation_json(const std::string& filename) {
 
     out << "    \"location\": ["
         << receiver_location[0] << ", " << receiver_location[1] << ", " << receiver_location[2] << "],\n";
+
+    out << "    \"num_hits\": "
+        << get_num_hits_receiver() << ",\n";
+
 
     // print out rotation matrix basis
 	out << "    \"rotation_matrix\": {\n";

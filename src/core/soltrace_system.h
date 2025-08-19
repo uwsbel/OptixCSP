@@ -46,6 +46,8 @@ namespace OptixCSP {
         void write_hp_output(const std::string& filename);
         // write simulation summary to a file, including receiver stats, etc
 		void write_simulation_json(const std::string& filename);
+		// get number of rays hitting the receiver
+        int get_num_hits_receiver();
 
 
 
@@ -104,6 +106,7 @@ namespace OptixCSP {
 
         int m_num_sunpoints;
         bool m_verbose;
+        int m_num_hits_receiver;
 
         OptixCSP::Vec3d m_sun_vector;
         double m_sun_angle;
