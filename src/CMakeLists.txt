@@ -77,10 +77,13 @@ foreach(shader ${SHADERS})
     )
 
     list(APPEND PTX_OUTPUTS ${SHADER_PTX})
+    list(APPEND SHADER_FILES ${SHADER_SRC})
+
 endforeach()
 
-add_custom_target(OptixCSP_shaders DEPENDS ${PTX_OUTPUTS})
-
+add_custom_target(OptixCSP_shaders DEPENDS ${PTX_OUTPUTS} ${SHADER_FILES}
+                                   SOURCES ${SHADER_FILES}
+)
 # ---------------------------------------------------------------------------
 # core depends on shaders target
 # ---------------------------------------------------------------------------

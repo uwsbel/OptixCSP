@@ -9,7 +9,7 @@ using namespace std;
 using namespace OptixCSP;
 
 int main(int argc, char* argv[]) {
-    bool parabolic = true; // Set to true for parabolic mirrors, false for flat mirrors
+    bool parabolic = false; // Set to true for parabolic mirrors, false for flat mirrors
     bool use_cylindical = false;
 
     if (argc != 2) {
@@ -171,6 +171,8 @@ int main(int argc, char* argv[]) {
 
     // set up sun angle 
     double sun_angle = 0.00465; // 0.00465; // sun angle
+    //double sun_angle = 0; // 0.00465; // sun angle
+
     system.set_sun_angle(sun_angle);
 	system.set_sun_vector(sun_vector);
 
@@ -188,6 +190,9 @@ int main(int argc, char* argv[]) {
     //////////////////////////
     // STEP 5  Post process //
     //////////////////////////
+    int num_hits = system.get_num_hits_receiver();
+    std::cout << "Number of rays hitting the receiver: " << num_hits << std::endl;
+
 	std::string out_dir = "out_three_heliostats/";
     if (!std::filesystem::exists(std::filesystem::path(out_dir))) {
         std::cout << "Creating output directory: " << out_dir << std::endl;
@@ -198,7 +203,8 @@ int main(int argc, char* argv[]) {
 
 	}
 
-    system.write_hp_output(out_dir + "hit_points_" + argv[1] + "_rays.csv");
+    system.write_hp_output(out_dir + "sun_error_hit_points_" + argv[1] + "_rays.csv");
+    system.write_simulation_json(out_dir + "sun_error_summary_" + argv[1] + "_rays.json");
 
     /////////////////////////////////////////
     // STEP 6  Be a good citizen, clean up //
