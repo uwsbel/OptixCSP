@@ -33,6 +33,7 @@ OptixCSP focuses on accuracy, performance, and extensibility so you can:
 * **Windows**: MS Visual Studio 2022, CUDA 12.8, OptiX 8.1
 * **Windows**: MS Visual Studio 2022, CUDA 12.3, OptiX 8.1
 * **Linux (redhat 8.0)**: gcc 11.2, CUDA 12.3, Optix 8.0
+* **Linux (redhat 8.0)**: gcc 12.1, CUDA 12.3, Optix 8.0
 * **Linux (ubuntu 22.04)**: gcc 11.4, CUDA 12.8, Optix 9.0
 
 ### Quick checks (Linux)
