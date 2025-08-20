@@ -5,7 +5,7 @@
 # ---------------------------------------------------------------------------
 # core target
 # ---------------------------------------------------------------------------
-add_library(OptixCSP_core STATIC)
+add_library(OptixCSP_core SHARED)
 
 find_package(CUDAToolkit REQUIRED)
 find_package(OptiX REQUIRED)
