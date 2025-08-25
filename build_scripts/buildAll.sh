@@ -1,8 +1,9 @@
 #!/bin/bash
-module load cuda/12.3
-#module load gcc/12.1
+# module load cuda/12.3
+# module load gcc/12.1
+module load PrgEnv-nvhpc/8.5.0
 
-BASE_DIR="${HOME}/solar"
+BASE_DIR=`pwd`
 
 cd ${BASE_DIR}
 git clone git@github.com:uwsbel/OptixCSP.git 
@@ -24,8 +25,8 @@ UNIT_TEST_DIR="${SOLTRACE_BLD}/google-tests/unit-tests"
 
 # this has to match run-time gcc version
 # gcc and gxx version
-CC="/opt/cray/pe/gcc/12.1.0/bin/gcc"
-CXX="/opt/cray/pe/gcc/12.1.0/bin/g++"
+CC="gcc"
+CXX="g++"
 
 echo "=== Building OptixCSP ==="
 if [ -d "${OPTIXCSP_BLD}" ]; then
@@ -39,7 +40,7 @@ cmake -S "${OPTIXCSP_SRC}" -B "${OPTIXCSP_BLD}" \
   -DCMAKE_CXX_COMPILER="${CXX}" \
   -DOptiX_INSTALL_DIR="${OPTIX_DIR}"
 
-cmake --build "${OPTIXCSP_BLD}" -j
+cmake --build "${OPTIXCSP_BLD}" -j4
 
 
 echo "=== Building Soltrace ==="
@@ -55,11 +56,11 @@ cmake -S "${SOLTRACE_SRC}" -B "${SOLTRACE_BLD}" \
   -DCMAKE_CXX_COMPILER="${CXX}" \
   -DOptiX_INSTALL_DIR="${OPTIX_DIR}" \
   -DOptixCSP_DIR="${OPTIXCSP_DIR}" \
-  -DSOLTRACE_BUILD_CORETRACE=ON \
+  -DSOLTRACE_BUILD_CORETRACE=OFF \
   -DSOLTRACE_BUILD_GUI=OFF \
   -DSOLTRACE_BUILD_OPTIX_SUPPORT=ON
 
-cmake --build "${SOLTRACE_BLD}"
+cmake --build "${SOLTRACE_BLD}" -j4
 
 echo "=== Running unit tests ==="
 cd ${UNIT_TEST_DIR}
