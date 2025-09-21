@@ -90,14 +90,9 @@ extern "C" __global__ void __closesthit__mirror()
 
 extern "C" __global__ void __closesthit__receiver()
 {
-    const OptixCSP::GeometryDataST::Rectangle_Flat& rectangle_flat = params.geometry_data_array[optixGetPrimitiveIndex()].getRectangle_Flat();
-
-    /*
-    float3 object_normal = make_float3( __uint_as_float( optixGetAttribute_0() ), __uint_as_float( optixGetAttribute_1() ),
+    float3 object_normal = make_float3( __uint_as_float( optixGetAttribute_0() ),
+                                        __uint_as_float( optixGetAttribute_1() ),
                                         __uint_as_float( optixGetAttribute_2() ) );
-    float3 world_normal  = normalize( optixTransformNormalFromObjectToWorldSpace( object_normal ) );
-    float3 ffnormal      = faceforward( world_normal, -optixGetWorldRayDirection(), world_normal );
-    */
 
     // Incident ray properties (origin, direction, and max t distance)
     const float3 ray_orig = optixGetWorldRayOrigin();
@@ -105,9 +100,7 @@ extern "C" __global__ void __closesthit__receiver()
     const float  ray_t    = optixGetRayTmax();
 
     // Compute the normal of the receiver and dot with ray direction to determine which side was hit
-    // TODO: this normal is hard coded based on how the geometry was defined, need to make more robust
-    const float3 receiver_normal = cross(rectangle_flat.x, rectangle_flat.y);
-    const float dot_product = dot(ray_dir, receiver_normal);
+    const float dot_product = dot(ray_dir, object_normal);
 
     float3 hit_point = ray_orig + ray_t * ray_dir;
 
