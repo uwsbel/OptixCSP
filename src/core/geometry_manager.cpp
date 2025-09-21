@@ -62,6 +62,16 @@ void GeometryManager::collect_geometry_info(const std::vector<std::shared_ptr<Cs
             }
         }
 
+        if (element->get_aperture_type() == ApertureType::TRIANGLE) {
+            element->compute_bounding_box();
+            m_min.x = (float)(element->get_lower_bounding_box()[0]);
+            m_min.y = (float)(element->get_lower_bounding_box()[1]);
+			m_min.z = (float)(element->get_lower_bounding_box()[2]);
+			m_max.x = (float)(element->get_upper_bounding_box()[0]);
+			m_max.y = (float)(element->get_upper_bounding_box()[1]);
+			m_max.z = (float)(element->get_upper_bounding_box()[2]);
+        }
+
 
         aabb.minX = m_min.x;
         aabb.minY = m_min.y;
@@ -79,10 +89,17 @@ void GeometryManager::collect_geometry_info(const std::vector<std::shared_ptr<Cs
 
 
     // add receiver sbt_index
+	//TODO: TAKE CARE OF THESE HARD CODED VALUES!!!! 
 	std::shared_ptr<CspElement> receiver = element_list[m_obj_counts - 1];
 
     if (receiver->get_surface_type() == SurfaceType::FLAT) {
-        m_sbt_index_H[m_obj_counts -1] = static_cast<uint32_t>(OpticalEntityType::RECTANGLE_FLAT_RECEIVER);
+
+        if (receiver->get_aperture_type() == ApertureType::RECTANGLE) {
+            m_sbt_index_H[m_obj_counts -1] = static_cast<uint32_t>(OpticalEntityType::RECTANGLE_FLAT_RECEIVER);
+        }
+        else if (receiver->get_aperture_type() == ApertureType::TRIANGLE) {
+            m_sbt_index_H[m_obj_counts - 1] = static_cast<uint32_t>(OpticalEntityType::TRIANGLE_FLAT_RECEIVER);
+        }
     }
     else if (receiver->get_surface_type() == SurfaceType::CYLINDER) {
         m_sbt_index_H[m_obj_counts -1] = static_cast<uint32_t>(OpticalEntityType::CYLINDRICAL_RECEIVER);

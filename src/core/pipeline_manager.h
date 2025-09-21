@@ -120,7 +120,7 @@ namespace OptixCSP {
          * @param surfaceType The type of surface (FLAT or CYLINDER).
          * @return The corresponding OptixProgramGroup.
          */
-        OptixProgramGroup getReceiverProgram(SurfaceType surfaceType) const;
+        OptixProgramGroup getReceiverProgram(SurfaceType surfaceType, ApertureType apertureType) const;
 
     private:
         SoltraceState& m_state;  ///< Reference to the simulation's OptiX state.

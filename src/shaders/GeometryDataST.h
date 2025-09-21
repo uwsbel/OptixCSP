@@ -15,7 +15,8 @@ namespace OptixCSP {
             CYLINDER_Y = 1,
             RECTANGLE_PARABOLIC = 2,
             UNKNOWN_TYPE = 3,
-            RECTANGLE_FLAT = 4
+            RECTANGLE_FLAT = 4,
+			TRIANGLE_FLAT = 5
         };
 
         struct Parallelogram
@@ -103,6 +104,20 @@ namespace OptixCSP {
             float curv_y;
         };
 
+        struct Triangle_Flat {
+            Triangle_Flat() = default;
+            Triangle_Flat(const float3& a, const float3& b, const float3& c)
+                : v0(a), e1(b - a), e2(c - a)
+            {
+                normal = normalize(cross(e1, e2));
+                d = dot(normal, v0);
+            }
+            float3 v0;     // base vertex
+            float3 e1, e2; // edges
+            float3 normal;
+            float  d;      // plane distance
+        };
+
         GeometryDataST() = default;
 
         void setParallelogram(const Parallelogram& p)
@@ -157,6 +172,19 @@ namespace OptixCSP {
             return rectangle_parabolic;
         }
 
+        void setTriangle_Flat(const Triangle_Flat& t)
+        {
+            assert(type == UNKNOWN_TYPE);
+            type = TRIANGLE_FLAT;
+            triangle_flat = t;
+		}
+
+        __host__ __device__ const Triangle_Flat& getTriangle_Flat() const
+        {
+            assert(type == TRIANGLE_FLAT);
+            return triangle_flat;
+		}
+
 
         Type type = UNKNOWN_TYPE;
 
@@ -167,6 +195,7 @@ namespace OptixCSP {
             Cylinder_Y cylinder_y;
             Rectangle_Parabolic rectangle_parabolic;
             Rectangle_Flat rectangle_flat;
+			Triangle_Flat triangle_flat;
         };
     };
 }

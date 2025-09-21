@@ -529,17 +529,22 @@ void SolTraceSystem::create_shader_binding_table(){
 
                 break;
             case OptixCSP::OpticalEntityType::RECTANGLE_FLAT_RECEIVER:
-                program_group_handle = pipeline_manager->getReceiverProgram(SurfaceType::FLAT);
+                program_group_handle = pipeline_manager->getReceiverProgram(SurfaceType::FLAT, ApertureType::RECTANGLE);
 				hitgroup_records_list[i].data.material_data.receiver = { 0.95, 0, 0, 0 };
                 printf("RECTANGLE_FLAT_RECEIVER, program group address: %p \n", program_group_handle);
 
                 break;
             case OptixCSP::OpticalEntityType::CYLINDRICAL_RECEIVER:
-                program_group_handle = pipeline_manager->getReceiverProgram(SurfaceType::CYLINDER);
+                program_group_handle = pipeline_manager->getReceiverProgram(SurfaceType::CYLINDER, ApertureType::RECTANGLE);
                 hitgroup_records_list[i].data.material_data.receiver = { 0.95, 0, 0, 0 };
                 printf("CYLINDRICAL_RECEIVER, program group address: %p \n", program_group_handle);
 
                 break;            
+            case OptixCSP::OpticalEntityType::TRIANGLE_FLAT_RECEIVER:
+                program_group_handle = pipeline_manager->getReceiverProgram(SurfaceType::FLAT, ApertureType::TRIANGLE);
+                hitgroup_records_list[i].data.material_data.receiver = { 0.95, 0, 0, 0 };
+                printf("TRIANGLE_FLAT_RECEIVER, program group address: %p \n", program_group_handle);
+				break;
             default:
 				std::cerr << "Unknown OpticalEntityType: " << my_type << std::endl;
 			}

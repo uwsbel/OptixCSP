@@ -4,7 +4,8 @@ namespace OptixCSP {
 
 	enum class ApertureType {
 		RECTANGLE,
-		CIRCLE
+		CIRCLE,
+		TRIANGLE
 	};
 
 

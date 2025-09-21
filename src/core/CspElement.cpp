@@ -163,6 +163,30 @@ GeometryDataST CspElement::toDeviceGeometryData() const {
 		}
     }
 
+    if (aperture_type == ApertureType::TRIANGLE) {
+
+		Vec3d v1, v2, v3;
+		// first cast to ApertureTriangle type
+		ApertureTriangle tri = static_cast<ApertureTriangle&>(*m_aperture);
+
+		v1 = tri.get_v0();
+		v2 = tri.get_v1();
+		v3 = tri.get_v2();
+
+		// given the origin and rotation, compute global coordinates of the triangle vertices
+		Matrix33d rotation_matrix = get_rotation_matrix();  // L2G rotation matrix
+		Vec3d v1_global = rotation_matrix * v1 + m_origin;
+		Vec3d v2_global = rotation_matrix * v2 + m_origin;
+		Vec3d v3_global = rotation_matrix * v3 + m_origin;
+
+		GeometryDataST::Triangle_Flat heliostat(OptixCSP::toFloat3(v1_global), OptixCSP::toFloat3(v2_global), OptixCSP::toFloat3(v3_global));
+        printf("v1 global: %f, %f, %f\n", v1_global[0], v1_global[1], v1_global[2]);
+        printf("v2 global: %f, %f, %f\n", v2_global[0], v2_global[1], v2_global[2]);
+        printf("v3 global: %f, %f, %f\n", v3_global[0], v3_global[1], v3_global[2]);
+
+		geometry_data.setTriangle_Flat(heliostat);        
+    }
+
     return geometry_data;
 }
 
@@ -270,7 +294,27 @@ void CspElement::compute_bounding_box() {
 	}
 
 
+    // bounding box for triangle aperture
+    if (aperture_type == ApertureType::TRIANGLE) {
+        // get the three vertices of the triangle aperture in local coordinates
+		// first cast to ApertureTriangle type
+		ApertureTriangle tri = static_cast<ApertureTriangle&>(*m_aperture);
 
+        Vec3d v1 = tri.get_v0();
+        Vec3d v2 = tri.get_v1();
+        Vec3d v3 = tri.get_v2();
+        // transform the vertices to the global frame
+        Vec3d v1_global = rotation_matrix * v1 + m_origin;
+        Vec3d v2_global = rotation_matrix * v2 + m_origin;
+        Vec3d v3_global = rotation_matrix * v3 + m_origin;
+        // now update the bounding box, need to find the min and max x, y, z
+        m_lower_box_bound[0] = fmin(fmin(v1_global[0], v2_global[0]), v3_global[0]);
+        m_lower_box_bound[1] = fmin(fmin(v1_global[1], v2_global[1]), v3_global[1]);
+        m_lower_box_bound[2] = fmin(fmin(v1_global[2], v2_global[2]), v3_global[2]);
+        m_upper_box_bound[0] = fmax(fmax(v1_global[0], v2_global[0]), v3_global[0]);
+        m_upper_box_bound[1] = fmax(fmax(v1_global[1], v2_global[1]), v3_global[1]);
+        m_upper_box_bound[2] = fmax(fmax(v1_global[2], v2_global[2]), v3_global[2]);
+	}
 
 
 

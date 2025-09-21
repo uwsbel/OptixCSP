@@ -36,8 +36,11 @@ extern "C" __global__ void __intersection__parallelogram()
             float a2 = dot( parallelogram.v2, vi );
             if( a2 >= 0 && a2 <= 1 )
             {
-                // float as uint? is this a boolean? 
-                optixReportIntersection( t, 0, float3_as_args( n ), __float_as_uint( a1 ), __float_as_uint( a2 ) );
+                optixReportIntersection( t, 
+                    0, 
+                    __float_as_uint( n.x ), 
+                    __float_as_uint( n.y ), 
+                    __float_as_uint( n.z ));
             }
         }
     }
@@ -77,8 +80,11 @@ extern "C" __global__ void __intersection__rectangle_flat()
         if (x >= -rectangle.width/2 && x <= rectangle.width/2 &&
             y >= -rectangle.height/2 && y <= rectangle.height/2)
         {
-            // Use raw coordinates like parallelogram intersection
-            optixReportIntersection(t, 0, float3_as_args(n), __float_as_uint(x), __float_as_uint(y));
+            optixReportIntersection(t,
+                0,
+                __float_as_uint(n.x),
+                __float_as_uint(n.y),
+                __float_as_uint(n.z));
         }
     }
 }
@@ -162,13 +168,11 @@ extern "C" __global__ void __intersection__cylinder_y()
     float3 world_hit_point = ray_orig + t * ray_dir;
 
     // Report intersection to OptiX
-    optixReportIntersection(
-        t,
+    optixReportIntersection(t,
         0,
-        float3_as_args(world_normal),
-        __float_as_uint(world_hit_point.x),
-        __float_as_uint(world_hit_point.y)
-    );
+        __float_as_uint(world_normal.x),
+        __float_as_uint(world_normal.y),
+        __float_as_uint(world_normal.z));
 }
 
 // ray cylinder intersection with top and bottom caps 
@@ -288,9 +292,9 @@ extern "C" __global__ void __intersection__cylinder_y_capped()
     optixReportIntersection(
         t,
         0, // User-defined instance ID or custom data
-        float3_as_args(world_normal),
-        __float_as_uint(world_hit_point.x),
-        __float_as_uint(world_hit_point.y)
+        __float_as_uint(world_normal.x),
+        __float_as_uint(world_normal.y),
+        __float_as_uint(world_normal.z)
     );
 }
 
@@ -441,7 +445,54 @@ extern "C" __global__ void __intersection__rectangle_parabolic()
     // Here, the two reported extra attributes are the parametric coordinates (a1, a2),
     // encoded as unsigned integers.
     optixReportIntersection(t, 0,
-        float3_as_args(world_normal),
-        __float_as_uint(a1),
-        __float_as_uint(a2));    
+        __float_as_uint(world_normal.x),
+        __float_as_uint(world_normal.y),
+        __float_as_uint(world_normal.z));    
+}
+
+
+// intersection algorithm for a flat triangle based on "Fast, Minimum Storage Ray/Triangle Intersection" by Möller and Trumbore (1997)
+// code from here: https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm 
+extern "C" __global__ void __intersection__triangle_flat()
+{
+	const OptixCSP::GeometryDataST::Triangle_Flat& tri = params.geometry_data_array[optixGetPrimitiveIndex()].getTriangle_Flat();
+
+    const float3 ro = optixGetObjectRayOrigin();
+    const float3 rd = optixGetObjectRayDirection();
+
+	//printf("Ray origin: (%f,%f,%f), direction: (%f,%f,%f)\n", ro.x, ro.y, ro.z, rd.x, rd.y, rd.z);
+
+    const float3 edge1 = tri.e1;
+    const float3 edge2 = tri.e2;
+
+
+    const float3 pvec = cross(rd, edge2);
+    const float  det = dot(edge1, pvec);
+
+    // Backface culling + parallel rejection
+    // (det must be strictly positive and not tiny)
+    const float eps = 1e-8f;
+    if (det <= eps) return;
+
+    const float inv_det = 1.0f / det;
+
+    const float3 tvec = ro - tri.v0;
+    const float  u = dot(tvec, pvec) * inv_det;
+    if (u < 0.0f || u > 1.0f) return;
+
+    const float3 qvec = cross(tvec, edge1);
+    const float  v = dot(rd, qvec) * inv_det;
+    if (v < 0.0f || (u + v) > 1.0f) 
+        return;
+
+    const float  t = dot(edge2, qvec) * inv_det;
+    if (t < optixGetRayTmin() || t > optixGetRayTmax()) return;
+
+    float3 world_normal = tri.normal;
+
+    optixReportIntersection(t, 0,
+        __float_as_uint(world_normal.x),
+        __float_as_uint(world_normal.y),
+        __float_as_uint(world_normal.z));
+
 }

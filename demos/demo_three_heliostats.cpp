@@ -8,16 +8,17 @@
 using namespace std;
 using namespace OptixCSP;
 
+enum RECEIVER_TYPE { FLAT, CYLINDRICAL, TRIANGLE };
+
 int main(int argc, char* argv[]) {
     bool parabolic = false; // Set to true for parabolic mirrors, false for flat mirrors
-    bool use_cylindical = false;
+    RECEIVER_TYPE receiver_type = TRIANGLE;
+    int num_rays = 1000;
 
-    if (argc != 2) {
-		std::cout << "Usage: " << argv[0] << " <num_of_rays>" << std::endl;
+    if (argc == 2) {
+		num_rays = atoi(argv[1]);
     }
 
-    // number of rays launched for the simulation
-	int num_rays = stoi(argv[1]);
     // Create the simulation system.
     SolTraceSystem system(num_rays);
 
@@ -119,7 +120,10 @@ int main(int argc, char* argv[]) {
         //////////////////////////////////////////////
         Vec3d receiver_origin(0, 0, 10.0); // origin of the receiver
         Vec3d receiver_aim_point(0, 5, 0); // aim point of the receiver
-        if (use_cylindical) {
+
+
+
+        if (receiver_type == RECEIVER_TYPE::CYLINDRICAL) {
             receiver_aim_point[2] = receiver_origin[2];
         }
 
@@ -135,22 +139,41 @@ int main(int argc, char* argv[]) {
 
         double receiver_dim_x;
         double receiver_dim_y;
-        if (use_cylindical) {
-            receiver_dim_x = 0.5;  // diameter of the receiver
-            receiver_dim_y = 2.0;  // full height of the cylindrical receiver
-        }
-        else {
-            receiver_dim_x = 2.0; // width of the receiver
-            receiver_dim_y = 2.0; // height of the receiver
-        }
 
-        auto receiver_aperture = std::make_shared<ApertureRectangle>(receiver_dim_x, receiver_dim_y);
-        e4->set_aperture(receiver_aperture);
+        switch (receiver_type) {
+            case RECEIVER_TYPE::CYLINDRICAL:
+                std::cout << "Using cylindrical receiver" << std::endl;
+                receiver_dim_x = 0.5;  // diameter of the receiver
+                receiver_dim_y = 2.0;  // full height of the cylindrical receiver
+
+                e4->set_aperture(std::make_shared<ApertureRectangle>(receiver_dim_x, receiver_dim_y));
+
+                break;
+            case RECEIVER_TYPE::FLAT:
+                std::cout << "Using flat receiver" << std::endl;
+                receiver_dim_x = 2.0; // width of the receiver
+                receiver_dim_y = 2.0; // height of the receiver
+
+                e4->set_aperture(std::make_shared<ApertureRectangle>(receiver_dim_x, receiver_dim_y));
+
+                break;
+            case RECEIVER_TYPE::TRIANGLE:
+                std::cout << "Using triangular receiver" << std::endl;
+				Vec3d p1(-0.5, -0.4, 0.0); // Bottom-left vertex
+				Vec3d p2( 0.5, -0.3, 0.0);  // Bottom-right vertex
+				Vec3d p3( 0.0,  0.5, 0.0);   // Top vertex
+
+                e4->set_aperture(std::make_shared<ApertureTriangle>(p1, p2, p3));
+
+                break;
+		}
+
+
 
         ///////////////////////////////////
         // STEP 2.3 create flat surface //
         //////////////////////////////////
-        if (use_cylindical) {
+        if (receiver_type == RECEIVER_TYPE::CYLINDRICAL) {
             // Create a cylindrical surface if use_cylindical is true
             auto receiver_surface = std::make_shared<SurfaceCylinder>();
             e4->set_surface(receiver_surface);
@@ -170,10 +193,10 @@ int main(int argc, char* argv[]) {
     Vec3d sun_vector(0.0, 0.0, 100.0); // sun vector
 
     // set up sun angle 
-    double sun_angle = 0.00465; // 0.00465; // sun angle
+    //double sun_angle = 0.00465; // 0.00465; // sun angle
     //double sun_angle = 0; // 0.00465; // sun angle
 
-    system.set_sun_angle(sun_angle);
+    //system.set_sun_angle(sun_angle);
 	system.set_sun_vector(sun_vector);
 
     ///////////////////////////////////
@@ -203,8 +226,8 @@ int main(int argc, char* argv[]) {
 
 	}
 
-    system.write_hp_output(out_dir + "sun_error_hit_points_" + argv[1] + "_rays.csv");
-    system.write_simulation_json(out_dir + "sun_error_summary_" + argv[1] + "_rays.json");
+    system.write_hp_output(out_dir + "sun_error_hit_points_" + to_string(num_rays) + "_rays.csv");
+    system.write_simulation_json(out_dir + "sun_error_summary_" + to_string(num_rays) + "_rays.json");
 
     /////////////////////////////////////////
     // STEP 6  Be a good citizen, clean up //

@@ -28,6 +28,7 @@ namespace OptixCSP{
         RECTANGLE_PARABOLIC_MIRROR    = 1,
         RECTANGLE_FLAT_RECEIVER       = 2,
         CYLINDRICAL_RECEIVER          = 3,
+		TRIANGLE_FLAT_RECEIVER        = 4,
 	    NUM_OPTICAL_ENTITY_TYPES
     };
 

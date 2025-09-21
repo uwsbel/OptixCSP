@@ -1,5 +1,6 @@
 #pragma once
 #include "soltrace_type.h"  // For ApertureType enum
+#include "vec3d.h"
 
 
 namespace OptixCSP {
@@ -68,5 +69,25 @@ namespace OptixCSP {
         //float3 m_x_axis;
         //float3 m_y_axis;
     };
+
+
+    class ApertureTriangle : public Aperture {
+    public:
+        ApertureTriangle();
+		// input three vertices in 3D space
+		// sequence matters, front side is determined by right-hand rule
+        ApertureTriangle(Vec3d v0, Vec3d v1, Vec3d v2);
+        virtual ~ApertureTriangle() = default;
+        virtual ApertureType get_aperture_type() const override;
+        Vec3d get_v0() const;
+		Vec3d get_v1() const;
+        Vec3d get_v2() const;
+
+    private:
+        Vec3d m_v0;
+        Vec3d m_v1;
+		Vec3d m_v2;
+    };
+
 
 }
