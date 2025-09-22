@@ -34,6 +34,10 @@ namespace OptixCSP {
 
 	    virtual GeometryDataST toDeviceGeometryData() const = 0;
 
+        void set_receiver(bool val) { m_receiver = val; }
+		bool is_receiver() const { return m_receiver; }
+        bool m_receiver; // true if receiver, false if not, you can think of receiver as the last element in the optical path
+
     protected:
         // Derived classes must implement bounding box computation.
         //virtual int set_bounding_box() = 0;

@@ -118,7 +118,7 @@ int main(int argc, char* argv[]) {
         //////////////////////////////////////////////
         // STEP 2.1 Create receiver, flat rectangle //
         //////////////////////////////////////////////
-        Vec3d receiver_origin(0, 0, 10.0); // origin of the receiver
+        Vec3d receiver_origin(0, 0, 9.5); // origin of the receiver
         Vec3d receiver_aim_point(0, 5, 0); // aim point of the receiver
 
 
@@ -140,6 +140,10 @@ int main(int argc, char* argv[]) {
         double receiver_dim_x;
         double receiver_dim_y;
 
+        Vec3d p1(-0.5, -0.4, 0.0); // Bottom-left vertex
+        Vec3d p2(0.5, -0.3, 0.0);  // Bottom-right vertex
+        Vec3d p3(0.0, 0.5, 0.0);   // Top vertex
+
         switch (receiver_type) {
             case RECEIVER_TYPE::CYLINDRICAL:
                 std::cout << "Using cylindrical receiver" << std::endl;
@@ -159,9 +163,6 @@ int main(int argc, char* argv[]) {
                 break;
             case RECEIVER_TYPE::TRIANGLE:
                 std::cout << "Using triangular receiver" << std::endl;
-				Vec3d p1(-0.5, -0.4, 0.0); // Bottom-left vertex
-				Vec3d p2( 0.5, -0.3, 0.0);  // Bottom-right vertex
-				Vec3d p3( 0.0,  0.5, 0.0);   // Top vertex
 
                 e4->set_aperture(std::make_shared<ApertureTriangle>(p1, p2, p3));
 
@@ -187,7 +188,14 @@ int main(int argc, char* argv[]) {
         ////////////////////////////////////////////
         // STEP 2.4 Add the element to the system //
         ///////////////////////////////////////////
+		e4->set_receiver(true); // Mark this element as a receiver
         system.add_element(e4); // Add the receiver to the system
+
+    // create another element e5 same as e4
+		CspElement e5 = *e4; // Copy e4 to e5
+        Vec3d p4(1.0, 0.5, 0);
+        e5.set_aperture(std::make_shared<ApertureTriangle>(p3, p2, p4));
+		system.add_element(std::make_shared<CspElement>(e5)); // Add e5 to the system
 
     
     Vec3d sun_vector(0.0, 0.0, 100.0); // sun vector

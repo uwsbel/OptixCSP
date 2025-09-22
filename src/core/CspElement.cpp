@@ -22,6 +22,7 @@ CspElement::CspElement() {
     m_zrot = 0.0;
     m_surface = nullptr;
     m_aperture = nullptr;
+    m_receiver = false;
 }
 
 // set and get origin 
@@ -180,10 +181,6 @@ GeometryDataST CspElement::toDeviceGeometryData() const {
 		Vec3d v3_global = rotation_matrix * v3 + m_origin;
 
 		GeometryDataST::Triangle_Flat heliostat(OptixCSP::toFloat3(v1_global), OptixCSP::toFloat3(v2_global), OptixCSP::toFloat3(v3_global));
-        printf("v1 global: %f, %f, %f\n", v1_global[0], v1_global[1], v1_global[2]);
-        printf("v2 global: %f, %f, %f\n", v2_global[0], v2_global[1], v2_global[2]);
-        printf("v3 global: %f, %f, %f\n", v3_global[0], v3_global[1], v3_global[2]);
-
 		geometry_data.setTriangle_Flat(heliostat);        
     }
 
